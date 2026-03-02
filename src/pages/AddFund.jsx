@@ -158,9 +158,27 @@ export default function AddFund() {
                 }}>
                   持有收益
                 </span>
+                <button
+                  type="button"
+                  onClick={() => setProfit(p => p.startsWith('-') ? p.slice(1) : (p ? '-' + p : '-'))}
+                  style={{
+                    width: 30, height: 30, borderRadius: 8, flexShrink: 0,
+                    border: "1px solid #e0e0e0", background: profit.startsWith('-') ? "rgba(34,197,94,0.08)" : "#f9f9f9",
+                    color: profit.startsWith('-') ? "#22c55e" : "#999",
+                    fontSize: 13, fontWeight: 600, cursor: "pointer",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                  }}
+                >
+                  +/−
+                </button>
                 <input
                   type="text" inputMode="decimal" value={profit}
-                  onChange={(e) => setProfit(e.target.value.replace(/[^\d.\-]/g, ''))}
+                  onChange={(e) => {
+                    const raw = e.target.value;
+                    const neg = raw.startsWith('-');
+                    const digits = raw.replace(/[^\d.]/g, '');
+                    setProfit(neg ? '-' + digits : digits);
+                  }}
                   placeholder="亏损填负数，如 -457"
                   style={{ flex: 1, fontSize: 14, outline: "none", border: "none", background: "transparent", color: "#1a1a2e" }}
                 />
