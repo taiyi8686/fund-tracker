@@ -46,7 +46,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-50 safe-bottom">
       <Header
-        title="基金小助手"
+        title="太一基金小助手"
         rightAction={
           <button onClick={loadData} disabled={loading} className="text-gray-500">
             <svg

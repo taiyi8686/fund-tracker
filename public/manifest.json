@@ -1,6 +1,6 @@
 {
-  "name": "基金小助手",
-  "short_name": "基金助手",
+  "name": "太一基金小助手",
+  "short_name": "太一基金",
   "description": "追踪基金实时涨幅和浮盈浮亏",
   "start_url": "/",
   "display": "standalone",
