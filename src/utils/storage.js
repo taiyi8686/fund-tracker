@@ -1,8 +1,13 @@
-const STORAGE_KEY = 'fund_tracker_data';
+import { getCurrentUser } from './auth';
+
+function getStorageKey() {
+  const user = getCurrentUser();
+  return user ? `fund_tracker_data_${user}` : 'fund_tracker_data';
+}
 
 export function getFunds() {
   try {
-    const data = localStorage.getItem(STORAGE_KEY);
+    const data = localStorage.getItem(getStorageKey());
     if (!data) return [];
     const parsed = JSON.parse(data);
     return parsed.funds || [];
@@ -12,7 +17,7 @@ export function getFunds() {
 }
 
 export function saveFunds(funds) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ funds }));
+  localStorage.setItem(getStorageKey(), JSON.stringify({ funds }));
 }
 
 export function addFund(fund) {

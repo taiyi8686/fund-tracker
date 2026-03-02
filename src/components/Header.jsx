@@ -1,14 +1,13 @@
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-export default function Header({ title, showBack = false, rightAction }) {
+export default function Header({ title, showBack = false, leftContent, rightAction }) {
   const navigate = useNavigate();
-  const location = useLocation();
 
   return (
     <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-gray-100">
       <div className="flex items-center justify-between h-12 px-4">
-        <div className="w-16">
-          {showBack && (
+        <div className="min-w-[50px]">
+          {showBack ? (
             <button
               onClick={() => navigate(-1)}
               className="text-gray-600 text-sm flex items-center gap-1"
@@ -18,10 +17,10 @@ export default function Header({ title, showBack = false, rightAction }) {
               </svg>
               返回
             </button>
-          )}
+          ) : leftContent || null}
         </div>
         <h1 className="text-base font-semibold text-gray-800">{title}</h1>
-        <div className="w-16 flex justify-end">
+        <div className="min-w-[50px] flex justify-end">
           {rightAction}
         </div>
       </div>

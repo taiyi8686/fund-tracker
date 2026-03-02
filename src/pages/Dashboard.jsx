@@ -5,12 +5,19 @@ import AssetSummary from '../components/AssetSummary';
 import FundCard from '../components/FundCard';
 import { getFunds } from '../utils/storage';
 import { fetchMultipleFundEstimates } from '../utils/fundApi';
+import { getCurrentUser, logout } from '../utils/auth';
 
 export default function Dashboard() {
   const [funds, setFunds] = useState([]);
   const [estimates, setEstimates] = useState({});
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const username = getCurrentUser();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login', { replace: true });
+  };
 
   const loadData = useCallback(async () => {
     const storedFunds = getFunds();
@@ -47,17 +54,25 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gray-50 safe-bottom">
       <Header
         title="太一基金小助手"
-        rightAction={
-          <button onClick={loadData} disabled={loading} className="text-gray-500">
-            <svg
-              className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`}
-              fill="none" stroke="currentColor" viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-              />
-            </svg>
+        leftContent={
+          <button onClick={handleLogout} className="text-xs text-gray-400">
+            退出
           </button>
+        }
+        rightAction={
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-400">{username}</span>
+            <button onClick={loadData} disabled={loading} className="text-gray-500">
+              <svg
+                className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`}
+                fill="none" stroke="currentColor" viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
+              </svg>
+            </button>
+          </div>
         }
       />
 
