@@ -1,7 +1,9 @@
-// JSONP call to 天天基金 realtime estimate API
-export function fetchFundEstimate(code) {
+// 请求队列，因为天天基金 API 固定使用 jsonpgz 作为回调函数名，
+// 必须串行请求，否则并发时会互相覆盖
+let queue = Promise.resolve();
+
+function fetchFundJsonp(code) {
   return new Promise((resolve, reject) => {
-    const callbackName = `jsonpgz_${code}_${Date.now()}`;
     const script = document.createElement('script');
     const timeout = setTimeout(() => {
       cleanup();
@@ -10,13 +12,13 @@ export function fetchFundEstimate(code) {
 
     function cleanup() {
       clearTimeout(timeout);
-      delete window[callbackName];
+      delete window.jsonpgz;
       if (script.parentNode) script.parentNode.removeChild(script);
     }
 
-    window[callbackName] = (data) => {
+    window.jsonpgz = (data) => {
       cleanup();
-      if (data) {
+      if (data && data.fundcode) {
         resolve({
           code: data.fundcode,
           name: data.name,
@@ -31,7 +33,7 @@ export function fetchFundEstimate(code) {
       }
     };
 
-    script.src = `https://fundgz.1234567.com.cn/js/${code}.js?rt=${Date.now()}&callback=${callbackName}`;
+    script.src = `https://fundgz.1234567.com.cn/js/${code}.js?rt=${Date.now()}`;
     script.onerror = () => {
       cleanup();
       reject(new Error('网络请求失败'));
@@ -40,21 +42,28 @@ export function fetchFundEstimate(code) {
   });
 }
 
-// Fetch estimates for multiple funds
+// 对外暴露的接口，自动排队串行执行
+export function fetchFundEstimate(code) {
+  const p = queue.then(() => fetchFundJsonp(code));
+  // 无论成功失败，都让队列继续
+  queue = p.catch(() => {});
+  return p;
+}
+
+// 批量获取多只基金估值
 export async function fetchMultipleFundEstimates(codes) {
   const results = {};
-  const promises = codes.map(async (code) => {
+  for (const code of codes) {
     try {
       results[code] = await fetchFundEstimate(code);
     } catch {
       results[code] = null;
     }
-  });
-  await Promise.all(promises);
+  }
   return results;
 }
 
-// Validate fund code format
+// 验证基金代码格式
 export function isValidFundCode(code) {
   return /^\d{6}$/.test(code);
 }
