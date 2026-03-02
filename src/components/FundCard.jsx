@@ -4,52 +4,60 @@ export default function FundCard({ fund, estimate }) {
   const navigate = useNavigate();
 
   const hasEstimate = !!estimate;
-  const marketValue = hasEstimate ? fund.shares * estimate.estimateValue : null;
-  const profit = marketValue !== null ? marketValue - fund.cost : null;
-  const profitRate = fund.cost > 0 && profit !== null ? (profit / fund.cost) * 100 : null;
-  const isProfit = profit !== null ? profit >= 0 : null;
 
-  const todayGrowth = hasEstimate ? estimate.estimateGrowth : null;
-  const isTodayUp = todayGrowth !== null ? todayGrowth >= 0 : null;
+  // 当日收益 = 持有金额 × 当日涨跌幅%
+  const dailyGrowth = hasEstimate ? estimate.estimateGrowth : null;
+  const dailyProfit = hasEstimate ? fund.amount * (estimate.estimateGrowth / 100) : null;
+
+  // 持有收益（用户填入的）
+  const totalProfit = fund.profit;
+  const totalProfitRate = fund.amount > 0
+    ? (totalProfit / (fund.amount - totalProfit)) * 100
+    : 0;
 
   return (
     <div
       onClick={() => navigate(`/fund/${fund.code}`)}
-      className="bg-white rounded-xl p-4 shadow-sm active:bg-gray-50 cursor-pointer transition-colors"
+      className="active:bg-gray-50 cursor-pointer transition-colors"
     >
-      <div className="flex justify-between items-start mb-2">
-        <div>
-          <div className="font-medium text-gray-800 text-sm">
-            {estimate?.name || fund.name || '加载中...'}
-          </div>
-          <div className="text-xs text-gray-400 mt-0.5">{fund.code}</div>
-        </div>
-        <div className="text-right">
-          {todayGrowth !== null ? (
-            <div className={`text-lg font-bold ${isTodayUp ? 'text-profit' : 'text-loss'}`}>
-              {isTodayUp ? '+' : ''}{todayGrowth.toFixed(2)}%
+      <div className="py-3">
+        {/* 基金名称和金额 */}
+        <div className="flex justify-between items-start mb-2">
+          <div className="flex-1 min-w-0">
+            <div className="text-sm text-gray-800 truncate">
+              {estimate?.name || fund.name || fund.code}
             </div>
-          ) : (
-            <div className="skeleton w-16 h-6" />
-          )}
-          <div className="text-xs text-gray-400 mt-0.5">今日估值涨幅</div>
-        </div>
-      </div>
+            <div className="text-xs text-gray-400 mt-0.5">¥ {fund.amount.toFixed(2)}</div>
+          </div>
 
-      <div className="flex justify-between items-end pt-2 border-t border-gray-50">
-        <div className="text-xs text-gray-500">
-          <span>持有 {fund.shares.toFixed(2)} 份</span>
-          <span className="mx-2">|</span>
-          <span>成本 ¥{fund.cost.toFixed(2)}</span>
-        </div>
-        <div className="text-right">
-          {profit !== null ? (
-            <span className={`text-sm font-medium ${isProfit ? 'text-profit' : 'text-loss'}`}>
-              {isProfit ? '+' : ''}¥{profit.toFixed(2)}
-            </span>
-          ) : (
-            <span className="skeleton inline-block w-14 h-4" />
-          )}
+          {/* 当日收益 */}
+          <div className="text-right mx-4 min-w-[70px]">
+            {dailyProfit !== null ? (
+              <>
+                <div className={`text-sm font-medium ${dailyGrowth >= 0 ? 'text-profit' : 'text-loss'}`}>
+                  {dailyProfit >= 0 ? '+' : ''}{dailyProfit.toFixed(2)}
+                </div>
+                <div className={`text-xs ${dailyGrowth >= 0 ? 'text-profit' : 'text-loss'}`}>
+                  {dailyGrowth >= 0 ? '+' : ''}{dailyGrowth.toFixed(2)}%
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="skeleton w-14 h-4 mb-1 ml-auto" />
+                <div className="skeleton w-10 h-3 ml-auto" />
+              </>
+            )}
+          </div>
+
+          {/* 持有收益 */}
+          <div className="text-right min-w-[70px]">
+            <div className={`text-sm font-medium ${totalProfit >= 0 ? 'text-profit' : 'text-loss'}`}>
+              {totalProfit >= 0 ? '+' : ''}{totalProfit.toFixed(2)}
+            </div>
+            <div className={`text-xs ${totalProfitRate >= 0 ? 'text-profit' : 'text-loss'}`}>
+              {totalProfitRate >= 0 ? '+' : ''}{totalProfitRate.toFixed(2)}%
+            </div>
+          </div>
         </div>
       </div>
     </div>

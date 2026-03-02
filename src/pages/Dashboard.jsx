@@ -23,7 +23,7 @@ export default function Dashboard() {
       const data = await fetchMultipleFundEstimates(codes);
       setEstimates(data);
     } catch {
-      // silently fail, show cached data
+      // silently fail
     } finally {
       setLoading(false);
     }
@@ -33,12 +33,15 @@ export default function Dashboard() {
     loadData();
   }, [loadData]);
 
-  // Refresh when returning to this page
   useEffect(() => {
     const handleFocus = () => loadData();
     window.addEventListener('focus', handleFocus);
     return () => window.removeEventListener('focus', handleFocus);
   }, [loadData]);
+
+  // 获取当前日期 MM-DD
+  const today = new Date();
+  const dateStr = `${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
   return (
     <div className="min-h-screen bg-gray-50 safe-bottom">
@@ -60,47 +63,54 @@ export default function Dashboard() {
 
       {funds.length > 0 ? (
         <>
-          <AssetSummary funds={funds} estimates={estimates} />
+          <AssetSummary funds={funds} estimates={estimates} loading={loading} />
 
-          <div className="px-4 mt-4 mb-2 flex justify-between items-center">
-            <span className="text-sm text-gray-500">
-              持有基金 ({funds.length})
-            </span>
-            {loading && (
-              <span className="text-xs text-gray-400">更新中...</span>
-            )}
+          {/* 表头 */}
+          <div className="flex justify-between items-center px-4 py-2 bg-gray-50 text-xs text-gray-400">
+            <span className="flex-1">基金</span>
+            <span className="text-right mx-4 min-w-[70px]">当日收益 {dateStr}</span>
+            <span className="text-right min-w-[70px]">持有收益</span>
           </div>
 
-          <div className="px-4 space-y-3 pb-24">
-            {funds.map((fund) => (
-              <FundCard
-                key={fund.code}
-                fund={fund}
-                estimate={estimates[fund.code]}
-              />
+          {/* 基金列表 */}
+          <div className="bg-white">
+            {funds.map((fund, i) => (
+              <div key={fund.code}>
+                <div className="px-4">
+                  <FundCard fund={fund} estimate={estimates[fund.code]} />
+                </div>
+                {i < funds.length - 1 && <div className="border-b border-gray-50 mx-4" />}
+              </div>
             ))}
+          </div>
+
+          {/* 底部操作 */}
+          <div className="flex justify-between items-center px-4 py-3">
+            <button
+              onClick={() => navigate('/add')}
+              className="text-sm text-blue-500 flex items-center gap-1"
+            >
+              <span className="text-lg leading-none">+</span> 新增持有
+            </button>
           </div>
         </>
       ) : (
         <div className="flex flex-col items-center justify-center mt-32 px-8">
-          <svg className="w-20 h-20 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-16 h-16 text-gray-200 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1}
               d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
             />
           </svg>
-          <p className="text-gray-400 text-base mb-2">还没有添加基金</p>
-          <p className="text-gray-300 text-sm">点击下方按钮开始追踪你的基金</p>
+          <p className="text-gray-400 text-sm mb-2">还没有添加基金</p>
+          <p className="text-gray-300 text-xs mb-6">点击下方按钮，添加你持有的基金</p>
+          <button
+            onClick={() => navigate('/add')}
+            className="px-8 py-2.5 bg-blue-500 text-white rounded-lg text-sm font-medium active:bg-blue-600"
+          >
+            + 新增持有
+          </button>
         </div>
       )}
-
-      <div className="fixed bottom-6 left-0 right-0 px-4 safe-bottom">
-        <button
-          onClick={() => navigate('/add')}
-          className="w-full py-3 bg-gradient-primary text-white rounded-xl font-medium shadow-lg active:opacity-90 transition-opacity"
-        >
-          + 添加基金
-        </button>
-      </div>
     </div>
   );
 }

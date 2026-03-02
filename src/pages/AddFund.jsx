@@ -11,21 +11,19 @@ export default function AddFund() {
 
   const [code, setCode] = useState(editCode || '');
   const [fundName, setFundName] = useState('');
-  const [shares, setShares] = useState('');
-  const [cost, setCost] = useState('');
+  const [amount, setAmount] = useState('');
+  const [profit, setProfit] = useState('');
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState('');
   const [confirmed, setConfirmed] = useState(false);
 
-  // Load existing fund data for editing
   useEffect(() => {
     if (editCode) {
       const existing = getFund(editCode);
       if (existing) {
-        setShares(String(existing.shares));
-        setCost(String(existing.cost));
+        setAmount(String(existing.amount));
+        setProfit(String(existing.profit));
         setConfirmed(true);
-        // Fetch name
         fetchFundEstimate(editCode).then(data => {
           setFundName(data.name);
         }).catch(() => {
@@ -61,115 +59,123 @@ export default function AddFund() {
     }
   };
 
-  const costPrice = shares && cost && parseFloat(shares) > 0
-    ? (parseFloat(cost) / parseFloat(shares)).toFixed(4)
-    : null;
-
   const handleSubmit = () => {
-    if (!confirmed || !shares || !cost) return;
+    const amountNum = parseFloat(amount);
+    if (!confirmed || !amountNum || amountNum <= 0) return;
 
-    const sharesNum = parseFloat(shares);
-    const costNum = parseFloat(cost);
-
-    if (sharesNum <= 0 || costNum <= 0) return;
+    const profitNum = parseFloat(profit) || 0;
 
     addFund({
       code,
       name: fundName,
-      shares: sharesNum,
-      cost: costNum,
+      amount: amountNum,
+      profit: profitNum,
     });
     navigate('/', { replace: true });
   };
 
-  const canSubmit = confirmed && shares && cost &&
-    parseFloat(shares) > 0 && parseFloat(cost) > 0;
+  const canSubmit = confirmed && amount && parseFloat(amount) > 0;
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header title={editCode ? '编辑基金' : '添加基金'} showBack />
+      <Header title={editCode ? '编辑持仓' : '新增持有'} showBack />
 
-      <div className="px-4 mt-4 space-y-4">
-        {/* Fund code input */}
-        <div className="bg-white rounded-xl p-4 shadow-sm">
-          <label className="block text-sm text-gray-500 mb-2">基金代码</label>
-          <div className="flex gap-2">
-            <input
-              type="text"
-              inputMode="numeric"
-              value={code}
-              onChange={handleCodeChange}
-              placeholder="输入6位基金代码，如 110011"
-              disabled={!!editCode}
-              className="flex-1 px-3 py-2.5 bg-gray-50 rounded-lg text-base outline-none focus:ring-2 focus:ring-purple-300 disabled:opacity-60"
-            />
-            {!editCode && (
+      <div className="px-4 mt-4">
+        <div className="bg-white rounded-xl p-5 shadow-sm space-y-5">
+          {/* 基金名称 */}
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <span className="text-sm font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-md whitespace-nowrap">基金名称</span>
+              {confirmed && fundName ? (
+                <span className="text-sm text-gray-800 truncate">{fundName}</span>
+              ) : (
+                <div className="flex-1 flex gap-2">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={code}
+                    onChange={handleCodeChange}
+                    placeholder="请输入基金代码，如 002207"
+                    disabled={!!editCode}
+                    className="flex-1 text-sm text-gray-800 outline-none bg-transparent placeholder-gray-300 disabled:opacity-60"
+                  />
+                </div>
+              )}
+            </div>
+            {!confirmed && !editCode && (
               <button
                 onClick={searchFund}
                 disabled={searching || code.length !== 6}
-                className="px-4 py-2.5 bg-gradient-primary text-white rounded-lg text-sm font-medium disabled:opacity-50"
+                className="w-full py-2.5 bg-blue-500 text-white rounded-lg text-sm font-medium disabled:opacity-40 active:bg-blue-600"
               >
-                {searching ? '搜索中...' : '查询'}
+                {searching ? '查询中...' : '查询基金'}
+              </button>
+            )}
+            {searchError && (
+              <p className="text-red-500 text-xs mt-2">{searchError}</p>
+            )}
+            {confirmed && !editCode && (
+              <button
+                onClick={() => { setConfirmed(false); setFundName(''); setCode(''); }}
+                className="text-xs text-blue-500 mt-1"
+              >
+                重新选择基金
               </button>
             )}
           </div>
-          {searchError && (
-            <p className="text-red-500 text-xs mt-2">{searchError}</p>
-          )}
-          {confirmed && fundName && (
-            <div className="mt-3 p-3 bg-purple-50 rounded-lg">
-              <span className="text-sm text-purple-700">✓ {fundName}</span>
-            </div>
-          )}
-        </div>
 
-        {/* Shares and cost input */}
-        {confirmed && (
-          <div className="bg-white rounded-xl p-4 shadow-sm space-y-4">
-            <div>
-              <label className="block text-sm text-gray-500 mb-2">持有份额</label>
-              <input
-                type="text"
-                inputMode="decimal"
-                value={shares}
-                onChange={(e) => setShares(e.target.value.replace(/[^\d.]/g, ''))}
-                placeholder="输入持有份额"
-                className="w-full px-3 py-2.5 bg-gray-50 rounded-lg text-base outline-none focus:ring-2 focus:ring-purple-300"
-              />
-            </div>
+          {confirmed && (
+            <>
+              <div className="border-t border-gray-100" />
 
-            <div>
-              <label className="block text-sm text-gray-500 mb-2">持仓成本（买入总金额）</label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">¥</span>
+              {/* 持有金额 */}
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-md whitespace-nowrap">持有金额</span>
                 <input
                   type="text"
                   inputMode="decimal"
-                  value={cost}
-                  onChange={(e) => setCost(e.target.value.replace(/[^\d.]/g, ''))}
-                  placeholder="输入买入总金额"
-                  className="w-full pl-7 pr-3 py-2.5 bg-gray-50 rounded-lg text-base outline-none focus:ring-2 focus:ring-purple-300"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value.replace(/[^\d.]/g, ''))}
+                  placeholder="输入该基金的持有金额"
+                  className="flex-1 text-sm text-gray-800 outline-none bg-transparent placeholder-gray-300"
                 />
               </div>
-            </div>
 
-            {costPrice && (
-              <div className="text-sm text-gray-500">
-                成本价：¥{costPrice} / 份
+              <div className="border-t border-gray-100" />
+
+              {/* 持有收益 */}
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-md whitespace-nowrap">持有收益</span>
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  value={profit}
+                  onChange={(e) => setProfit(e.target.value.replace(/[^\d.\-]/g, ''))}
+                  placeholder="亏损填负数，如 -457"
+                  className="flex-1 text-sm text-gray-800 outline-none bg-transparent placeholder-gray-300"
+                />
               </div>
-            )}
-          </div>
-        )}
+            </>
+          )}
+        </div>
 
-        {/* Submit button */}
         {confirmed && (
-          <button
-            onClick={handleSubmit}
-            disabled={!canSubmit}
-            className="w-full py-3 bg-gradient-primary text-white rounded-xl font-medium shadow-lg disabled:opacity-50 active:opacity-90 transition-opacity"
-          >
-            {editCode ? '保存修改' : '添加基金'}
-          </button>
+          <>
+            <button
+              onClick={() => navigate('/add')}
+              className="mt-4 text-sm text-blue-500 flex items-center gap-1 justify-end w-full"
+            >
+              <span className="text-lg leading-none">+</span> 继续添加
+            </button>
+
+            <button
+              onClick={handleSubmit}
+              disabled={!canSubmit}
+              className="w-full mt-4 py-3 bg-blue-500 text-white rounded-xl font-medium disabled:opacity-40 active:bg-blue-600 transition-colors"
+            >
+              完成
+            </button>
+          </>
         )}
       </div>
     </div>
