@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 
-export default function FundCard({ fund, estimate }) {
+export default function FundCard({ fund, estimate, accountId }) {
   const navigate = useNavigate();
 
   const hasEstimate = !!estimate;
@@ -17,7 +17,7 @@ export default function FundCard({ fund, estimate }) {
 
   return (
     <div
-      onClick={() => navigate(`/fund/${fund.code}`)}
+      onClick={() => navigate(`/fund/${accountId}/${fund.code}`)}
       className="active:bg-gray-50 cursor-pointer transition-colors"
     >
       <div className="py-3">

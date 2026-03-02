@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import Header from '../components/Header';
 import { fetchFundEstimate, isValidFundCode } from '../utils/fundApi';
-import { addFund, getFund } from '../utils/storage';
+import { addFundToAccount, getFundFromAccount, getAccount } from '../utils/storage';
 
 export default function AddFund() {
+  const { accountId } = useParams();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const editCode = searchParams.get('edit');
@@ -17,9 +18,11 @@ export default function AddFund() {
   const [searchError, setSearchError] = useState('');
   const [confirmed, setConfirmed] = useState(false);
 
+  const account = getAccount(accountId);
+
   useEffect(() => {
-    if (editCode) {
-      const existing = getFund(editCode);
+    if (editCode && accountId) {
+      const existing = getFundFromAccount(accountId, editCode);
       if (existing) {
         setAmount(String(existing.amount));
         setProfit(String(existing.profit));
@@ -31,7 +34,7 @@ export default function AddFund() {
         });
       }
     }
-  }, [editCode]);
+  }, [editCode, accountId]);
 
   const handleCodeChange = (e) => {
     const val = e.target.value.replace(/\D/g, '').slice(0, 6);
@@ -65,20 +68,22 @@ export default function AddFund() {
 
     const profitNum = parseFloat(profit) || 0;
 
-    addFund({
+    addFundToAccount(accountId, {
       code,
       name: fundName,
       amount: amountNum,
       profit: profitNum,
     });
-    navigate('/', { replace: true });
+    navigate(`/?tab=${accountId}`, { replace: true });
   };
 
   const canSubmit = confirmed && amount && parseFloat(amount) > 0;
 
+  if (!account) return null;
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header title={editCode ? '编辑持仓' : '新增持有'} showBack />
+      <Header title={`${editCode ? '编辑' : '新增'}持有 · ${account.name}`} showBack />
 
       <div className="px-4 mt-4">
         <div className="bg-white rounded-xl p-5 shadow-sm space-y-5">
@@ -89,17 +94,15 @@ export default function AddFund() {
               {confirmed && fundName ? (
                 <span className="text-sm text-gray-800 truncate">{fundName}</span>
               ) : (
-                <div className="flex-1 flex gap-2">
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    value={code}
-                    onChange={handleCodeChange}
-                    placeholder="请输入基金代码，如 002207"
-                    disabled={!!editCode}
-                    className="flex-1 text-sm text-gray-800 outline-none bg-transparent placeholder-gray-300 disabled:opacity-60"
-                  />
-                </div>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={code}
+                  onChange={handleCodeChange}
+                  placeholder="请输入基金代码，如 002207"
+                  disabled={!!editCode}
+                  className="flex-1 text-sm text-gray-800 outline-none bg-transparent placeholder-gray-300 disabled:opacity-60"
+                />
               )}
             </div>
             {!confirmed && !editCode && (
@@ -127,8 +130,6 @@ export default function AddFund() {
           {confirmed && (
             <>
               <div className="border-t border-gray-100" />
-
-              {/* 持有金额 */}
               <div className="flex items-center gap-3">
                 <span className="text-sm font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-md whitespace-nowrap">持有金额</span>
                 <input
@@ -140,10 +141,7 @@ export default function AddFund() {
                   className="flex-1 text-sm text-gray-800 outline-none bg-transparent placeholder-gray-300"
                 />
               </div>
-
               <div className="border-t border-gray-100" />
-
-              {/* 持有收益 */}
               <div className="flex items-center gap-3">
                 <span className="text-sm font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-md whitespace-nowrap">持有收益</span>
                 <input
@@ -160,22 +158,13 @@ export default function AddFund() {
         </div>
 
         {confirmed && (
-          <>
-            <button
-              onClick={() => navigate('/add')}
-              className="mt-4 text-sm text-blue-500 flex items-center gap-1 justify-end w-full"
-            >
-              <span className="text-lg leading-none">+</span> 继续添加
-            </button>
-
-            <button
-              onClick={handleSubmit}
-              disabled={!canSubmit}
-              className="w-full mt-4 py-3 bg-blue-500 text-white rounded-xl font-medium disabled:opacity-40 active:bg-blue-600 transition-colors"
-            >
-              完成
-            </button>
-          </>
+          <button
+            onClick={handleSubmit}
+            disabled={!canSubmit}
+            className="w-full mt-5 py-3 bg-blue-500 text-white rounded-xl font-medium disabled:opacity-40 active:bg-blue-600 transition-colors"
+          >
+            完成
+          </button>
         )}
       </div>
     </div>

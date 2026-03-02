@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
-import { getFund, removeFund } from '../utils/storage';
+import { getFundFromAccount, removeFundFromAccount } from '../utils/storage';
 import { fetchFundEstimate } from '../utils/fundApi';
 
 export default function FundDetail() {
-  const { code } = useParams();
+  const { accountId, code } = useParams();
   const navigate = useNavigate();
   const [fund, setFund] = useState(null);
   const [estimate, setEstimate] = useState(null);
@@ -13,9 +13,9 @@ export default function FundDetail() {
   const [showConfirm, setShowConfirm] = useState(false);
 
   useEffect(() => {
-    const stored = getFund(code);
+    const stored = getFundFromAccount(accountId, code);
     if (!stored) {
-      navigate('/', { replace: true });
+      navigate(`/?tab=${accountId}`, { replace: true });
       return;
     }
     setFund(stored);
@@ -24,7 +24,7 @@ export default function FundDetail() {
       .then(setEstimate)
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [code, navigate]);
+  }, [code, accountId, navigate]);
 
   if (!fund) return null;
 
@@ -36,8 +36,8 @@ export default function FundDetail() {
   const totalProfitRate = cost > 0 ? (totalProfit / cost) * 100 : 0;
 
   const handleDelete = () => {
-    removeFund(code);
-    navigate('/', { replace: true });
+    removeFundFromAccount(accountId, code);
+    navigate(`/?tab=${accountId}`, { replace: true });
   };
 
   const InfoRow = ({ label, value, valueClass = '' }) => (
@@ -54,7 +54,7 @@ export default function FundDetail() {
         showBack
         rightAction={
           <button
-            onClick={() => navigate(`/add?edit=${code}`)}
+            onClick={() => navigate(`/add/${accountId}?edit=${code}`)}
             className="text-blue-500 text-sm"
           >
             编辑
@@ -62,7 +62,6 @@ export default function FundDetail() {
         }
       />
 
-      {/* 基金名称和实时涨幅 */}
       <div className="bg-white mx-4 mt-4 rounded-xl p-5 shadow-sm">
         <div className="text-base font-semibold text-gray-800">
           {estimate?.name || fund.name || '加载中...'}
@@ -90,7 +89,6 @@ export default function FundDetail() {
         {loading && <div className="skeleton w-32 h-8 mt-4" />}
       </div>
 
-      {/* 当日估算收益 */}
       {dailyProfit !== null && (
         <div className={`mx-4 mt-3 rounded-xl p-4 shadow-sm ${dailyGrowth >= 0 ? 'bg-red-50' : 'bg-green-50'}`}>
           <div className="text-xs text-gray-500 mb-1">当日估算收益</div>
@@ -100,7 +98,6 @@ export default function FundDetail() {
         </div>
       )}
 
-      {/* 持有收益 */}
       <div className={`mx-4 mt-3 rounded-xl p-4 shadow-sm ${totalProfit >= 0 ? 'bg-red-50' : 'bg-green-50'}`}>
         <div className="text-xs text-gray-500 mb-1">持有收益</div>
         <div className={`text-2xl font-bold ${totalProfit >= 0 ? 'text-profit' : 'text-loss'}`}>
@@ -111,7 +108,6 @@ export default function FundDetail() {
         </div>
       </div>
 
-      {/* 明细 */}
       <div className="bg-white mx-4 mt-3 rounded-xl p-4 shadow-sm">
         <InfoRow label="持有金额" value={`¥${fund.amount.toFixed(2)}`} />
         <InfoRow label="买入成本" value={`¥${cost.toFixed(2)}`} />
@@ -121,7 +117,6 @@ export default function FundDetail() {
         <InfoRow label="添加日期" value={fund.addedAt} />
       </div>
 
-      {/* 删除 */}
       <div className="px-4 mt-6 pb-8">
         {!showConfirm ? (
           <button
@@ -132,16 +127,12 @@ export default function FundDetail() {
           </button>
         ) : (
           <div className="flex gap-3">
-            <button
-              onClick={() => setShowConfirm(false)}
-              className="flex-1 py-3 bg-gray-100 rounded-xl text-gray-600 text-sm"
-            >
+            <button onClick={() => setShowConfirm(false)}
+              className="flex-1 py-3 bg-gray-100 rounded-xl text-gray-600 text-sm">
               取消
             </button>
-            <button
-              onClick={handleDelete}
-              className="flex-1 py-3 bg-red-500 text-white rounded-xl text-sm active:bg-red-600"
-            >
+            <button onClick={handleDelete}
+              className="flex-1 py-3 bg-red-500 text-white rounded-xl text-sm active:bg-red-600">
               确认删除
             </button>
           </div>
