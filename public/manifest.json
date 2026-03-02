@@ -1,0 +1,21 @@
+{
+  "name": "基金小助手",
+  "short_name": "基金助手",
+  "description": "追踪基金实时涨幅和浮盈浮亏",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f6fa",
+  "theme_color": "#667eea",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
