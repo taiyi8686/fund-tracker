@@ -71,32 +71,33 @@ export default function AddFund() {
   if (!account) return null;
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg)' }}>
+    <div className="app-shell" style={{ background: '#f5f6fa' }}>
       <Header title={`${editCode ? '编辑' : '新增'}持有 · ${account.name}`} showBack />
 
-      <div className="p-4">
-        <div className="bg-white rounded-lg overflow-hidden">
-          {/* 基金名称 */}
-          <div className="px-4 py-3.5">
-            <div className="flex items-center gap-3">
-              <span
-                className="text-xs font-medium px-2.5 py-1 rounded shrink-0"
-                style={{ color: 'var(--color-accent)', backgroundColor: '#EFF6FF' }}
-              >
+      <div style={{ padding: 16 }}>
+        <div style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
+          {/* Fund Code */}
+          <div style={{ padding: '16px 20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <span style={{
+                fontSize: 12, fontWeight: 500, padding: '4px 10px', borderRadius: 6,
+                color: '#764ba2', background: 'rgba(118,75,162,0.08)', flexShrink: 0,
+              }}>
                 基金名称
               </span>
               {confirmed && fundName ? (
-                <span className="text-sm" style={{ color: 'var(--color-text-primary)' }}>{fundName}</span>
+                <span style={{ fontSize: 14, color: '#1a1a2e' }}>{fundName}</span>
               ) : (
                 <input
-                  type="text"
-                  inputMode="numeric"
-                  value={code}
+                  type="text" inputMode="numeric" value={code}
                   onChange={handleCodeChange}
                   placeholder="请输入基金代码，如 002207"
                   disabled={!!editCode}
-                  className="flex-1 text-sm outline-none bg-transparent disabled:opacity-60"
-                  style={{ color: 'var(--color-text-primary)' }}
+                  style={{
+                    flex: 1, fontSize: 14, outline: 'none', border: 'none',
+                    background: 'transparent', color: '#1a1a2e',
+                    opacity: editCode ? 0.6 : 1,
+                  }}
                 />
               )}
             </div>
@@ -104,18 +105,17 @@ export default function AddFund() {
               <button
                 onClick={searchFund}
                 disabled={searching || code.length !== 6}
-                className="w-full mt-3 py-2.5 text-white rounded-lg text-sm font-medium disabled:opacity-40 cursor-pointer active:opacity-90 transition-opacity"
-                style={{ backgroundColor: 'var(--color-accent)' }}
+                className="gradient-btn"
+                style={{ width: '100%', marginTop: 12, padding: '10px 0', fontSize: 14 }}
               >
                 {searching ? '查询中...' : '查询基金'}
               </button>
             )}
-            {searchError && <p className="text-xs mt-2" style={{ color: 'var(--color-profit)' }}>{searchError}</p>}
+            {searchError && <p style={{ fontSize: 12, marginTop: 8, color: '#e94560' }}>{searchError}</p>}
             {confirmed && !editCode && (
               <button
                 onClick={() => { setConfirmed(false); setFundName(''); setCode(''); }}
-                className="text-xs mt-1.5 cursor-pointer"
-                style={{ color: 'var(--color-accent)' }}
+                style={{ fontSize: 12, marginTop: 6, color: '#764ba2', background: 'none', border: 'none', cursor: 'pointer' }}
               >
                 重新选择基金
               </button>
@@ -124,36 +124,34 @@ export default function AddFund() {
 
           {confirmed && (
             <>
-              <div style={{ borderTop: '1px solid var(--color-border)' }} />
-              <div className="px-4 py-3.5 flex items-center gap-3">
-                <span
-                  className="text-xs font-medium px-2.5 py-1 rounded shrink-0"
-                  style={{ color: 'var(--color-accent)', backgroundColor: '#EFF6FF' }}
-                >
+              <div style={{ borderTop: '1px solid rgba(0,0,0,0.06)' }} />
+              <div style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                <span style={{
+                  fontSize: 12, fontWeight: 500, padding: '4px 10px', borderRadius: 6,
+                  color: '#764ba2', background: 'rgba(118,75,162,0.08)', flexShrink: 0,
+                }}>
                   持有金额
                 </span>
                 <input
                   type="text" inputMode="decimal" value={amount}
                   onChange={(e) => setAmount(e.target.value.replace(/[^\d.]/g, ''))}
                   placeholder="输入该基金的持有金额"
-                  className="flex-1 text-sm outline-none bg-transparent"
-                  style={{ color: 'var(--color-text-primary)' }}
+                  style={{ flex: 1, fontSize: 14, outline: 'none', border: 'none', background: 'transparent', color: '#1a1a2e' }}
                 />
               </div>
-              <div style={{ borderTop: '1px solid var(--color-border)' }} />
-              <div className="px-4 py-3.5 flex items-center gap-3">
-                <span
-                  className="text-xs font-medium px-2.5 py-1 rounded shrink-0"
-                  style={{ color: 'var(--color-accent)', backgroundColor: '#EFF6FF' }}
-                >
+              <div style={{ borderTop: '1px solid rgba(0,0,0,0.06)' }} />
+              <div style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                <span style={{
+                  fontSize: 12, fontWeight: 500, padding: '4px 10px', borderRadius: 6,
+                  color: '#764ba2', background: 'rgba(118,75,162,0.08)', flexShrink: 0,
+                }}>
                   持有收益
                 </span>
                 <input
                   type="text" inputMode="decimal" value={profit}
                   onChange={(e) => setProfit(e.target.value.replace(/[^\d.\-]/g, ''))}
                   placeholder="亏损填负数，如 -457"
-                  className="flex-1 text-sm outline-none bg-transparent"
-                  style={{ color: 'var(--color-text-primary)' }}
+                  style={{ flex: 1, fontSize: 14, outline: 'none', border: 'none', background: 'transparent', color: '#1a1a2e' }}
                 />
               </div>
             </>
@@ -164,8 +162,8 @@ export default function AddFund() {
           <button
             onClick={handleSubmit}
             disabled={!confirmed || !amount || !(parseFloat(amount) > 0)}
-            className="w-full mt-4 py-3 text-white rounded-lg text-[15px] font-medium disabled:opacity-40 cursor-pointer active:opacity-90 transition-opacity"
-            style={{ backgroundColor: 'var(--color-accent)' }}
+            className="gradient-btn"
+            style={{ width: '100%', marginTop: 16, padding: '12px 0', fontSize: 15 }}
           >
             完成
           </button>

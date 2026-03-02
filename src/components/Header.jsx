@@ -4,23 +4,38 @@ export default function Header({ title, showBack = false, leftContent, rightActi
   const navigate = useNavigate();
 
   return (
-    <header className="sticky top-0 z-10 bg-white border-b" style={{ borderColor: 'var(--color-border)' }}>
-      <div className="flex items-center justify-between h-11 px-5">
-        <div className="min-w-12">
-          {showBack ? (
-            <button
-              onClick={() => navigate(-1)}
-              className="flex items-center justify-center w-11 h-11 -ml-2 cursor-pointer"
-            >
-              <svg className="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-          ) : leftContent || null}
-        </div>
-        <h1 className="text-base font-semibold" style={{ color: 'var(--color-text-primary)' }}>{title}</h1>
-        <div className="min-w-12 flex justify-end">{rightAction}</div>
+    <header
+      style={{
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        padding: '0 16px',
+        height: 48,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        color: '#fff',
+        position: 'sticky',
+        top: 0,
+        zIndex: 10,
+      }}
+    >
+      <div style={{ minWidth: 48 }}>
+        {showBack ? (
+          <button
+            onClick={() => navigate(-1)}
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              width: 44, height: 44, marginLeft: -8,
+              background: 'none', border: 'none', cursor: 'pointer', color: '#fff',
+            }}
+          >
+            <svg style={{ width: 20, height: 20 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+        ) : leftContent || null}
       </div>
+      <span style={{ fontSize: 16, fontWeight: 600 }}>{title}</span>
+      <div style={{ minWidth: 48, display: 'flex', justifyContent: 'flex-end' }}>{rightAction}</div>
     </header>
   );
 }

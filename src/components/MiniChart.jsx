@@ -10,7 +10,7 @@ export default function MiniChart({ seed = 'default', isPositive = true }) {
     }
 
     const N = 28;
-    const W = 120;
+    const W = 100;
     const H = 36;
     const pts = [];
     let val = 50;
@@ -36,11 +36,11 @@ export default function MiniChart({ seed = 'default', isPositive = true }) {
   }, [seed, isPositive]);
 
   return (
-    <svg width="120" height="36" viewBox="0 0 120 36" className="block shrink-0">
+    <svg width="100" height="36" viewBox="0 0 100 36" style={{ display: 'block', flexShrink: 0 }}>
       <path
         d={pathD}
         fill="none"
-        stroke={isPositive ? 'var(--color-profit)' : 'var(--color-loss)'}
+        stroke={isPositive ? '#e94560' : '#22c55e'}
         strokeWidth="1.5"
         strokeLinejoin="round"
         strokeLinecap="round"

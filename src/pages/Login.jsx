@@ -25,68 +25,87 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--color-bg)' }}>
-      {/* 品牌区 */}
-      <div className="pt-20 pb-8 text-center">
+    <div className="app-shell">
+      {/* Brand Area */}
+      <div
+        style={{
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          padding: '80px 20px 48px',
+          borderRadius: '0 0 32px 32px',
+          textAlign: 'center',
+          color: '#fff',
+        }}
+      >
         <div
-          className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center"
-          style={{ background: 'linear-gradient(135deg, #2563EB, #7C3AED)' }}
+          style={{
+            width: 64, height: 64, borderRadius: 20,
+            background: 'rgba(255,255,255,0.2)',
+            margin: '0 auto 16px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}
         >
-          <svg className="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg style={{ width: 36, height: 36 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
           </svg>
         </div>
-        <h1 className="text-xl font-bold" style={{ color: 'var(--color-text-primary)' }}>太一基金小助手</h1>
-        <p className="text-sm mt-1" style={{ color: 'var(--color-text-tertiary)' }}>追踪基金涨跌，一目了然</p>
+        <h1 style={{ fontSize: 22, fontWeight: 700, margin: 0 }}>太一基金小助手</h1>
+        <p style={{ fontSize: 14, marginTop: 6, opacity: 0.8 }}>追踪基金涨跌，一目了然</p>
       </div>
 
-      {/* 表单 */}
-      <div className="px-5 flex-1">
-        <div className="bg-white rounded-xl p-5">
-          <h2 className="text-base font-semibold mb-5" style={{ color: 'var(--color-text-primary)' }}>
+      {/* Form */}
+      <div style={{ padding: '24px 20px' }}>
+        <div style={{ background: '#fff', borderRadius: 16, padding: 24, boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
+          <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 20, color: '#1a1a2e' }}>
             {isRegister ? '注册新账号' : '登录'}
           </h2>
 
-          <div className="space-y-4">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div>
-              <label className="block text-xs mb-1.5" style={{ color: 'var(--color-text-secondary)' }}>用户名</label>
+              <label style={{ display: 'block', fontSize: 12, marginBottom: 6, color: '#666' }}>用户名</label>
               <input
                 type="text" value={username}
                 onChange={(e) => { setUsername(e.target.value); setError(''); }}
                 placeholder="输入你的用户名"
-                className="w-full px-4 py-3 rounded-lg text-base outline-none"
-                style={{ backgroundColor: '#F9FAFB', color: 'var(--color-text-primary)' }}
+                style={{
+                  width: '100%', padding: '12px 16px', borderRadius: 10,
+                  border: '1px solid #eee', fontSize: 15, outline: 'none',
+                  background: '#f9fafb', color: '#1a1a2e',
+                  boxSizing: 'border-box',
+                }}
               />
             </div>
             <div>
-              <label className="block text-xs mb-1.5" style={{ color: 'var(--color-text-secondary)' }}>密码</label>
+              <label style={{ display: 'block', fontSize: 12, marginBottom: 6, color: '#666' }}>密码</label>
               <input
                 type="password" value={password}
                 onChange={(e) => { setPassword(e.target.value); setError(''); }}
                 placeholder={isRegister ? '设置密码（至少4位）' : '输入密码'}
-                className="w-full px-4 py-3 rounded-lg text-base outline-none"
-                style={{ backgroundColor: '#F9FAFB', color: 'var(--color-text-primary)' }}
+                style={{
+                  width: '100%', padding: '12px 16px', borderRadius: 10,
+                  border: '1px solid #eee', fontSize: 15, outline: 'none',
+                  background: '#f9fafb', color: '#1a1a2e',
+                  boxSizing: 'border-box',
+                }}
               />
             </div>
           </div>
 
-          {error && <p className="text-sm mt-3 text-profit">{error}</p>}
+          {error && <p style={{ fontSize: 13, marginTop: 12, color: '#e94560' }}>{error}</p>}
 
           <button
             onClick={handleSubmit}
             disabled={loading || !username || !password}
-            className="w-full mt-5 py-3 text-white rounded-lg font-medium disabled:opacity-40 cursor-pointer active:opacity-90 transition-opacity"
-            style={{ backgroundColor: 'var(--color-accent)' }}
+            className="gradient-btn"
+            style={{ width: '100%', marginTop: 20, padding: '12px 0', fontSize: 15 }}
           >
             {loading ? '请稍候...' : isRegister ? '注册' : '登录'}
           </button>
         </div>
 
-        <div className="text-center mt-5">
+        <div style={{ textAlign: 'center', marginTop: 20 }}>
           <button
             onClick={() => { setIsRegister(!isRegister); setError(''); }}
-            className="text-sm cursor-pointer"
-            style={{ color: 'var(--color-accent)' }}
+            style={{ fontSize: 13, color: '#764ba2', background: 'none', border: 'none', cursor: 'pointer' }}
           >
             {isRegister ? '已有账号？去登录' : '没有账号？注册一个'}
           </button>

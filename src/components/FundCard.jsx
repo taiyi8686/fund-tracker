@@ -16,48 +16,55 @@ export default function FundCard({ fund, estimate, accountId, clickable = true }
     }
   };
 
+  const up = '#e94560';
+  const down = '#22c55e';
+
   return (
     <div
       onClick={handleClick}
-      className={`fund-grid px-5 py-3.5 min-h-[56px] transition-colors duration-150 ${
-        clickable ? 'cursor-pointer active:bg-gray-50' : ''
-      }`}
+      className="fund-grid"
+      style={{
+        padding: '14px 20px',
+        minHeight: 56,
+        cursor: clickable ? 'pointer' : 'default',
+        transition: 'background-color 0.15s',
+      }}
     >
-      {/* 列1：基金名 / ¥金额 */}
-      <div className="min-w-0 pr-2">
-        <div className="text-[15px] font-bold truncate" style={{ color: 'var(--color-text-primary)' }}>
+      {/* Col 1: Fund name / Amount */}
+      <div style={{ minWidth: 0, paddingRight: 8 }}>
+        <div style={{ fontSize: 15, fontWeight: 600, color: '#1a1a2e', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {estimate?.name || fund.name || fund.code}
         </div>
-        <div className="text-xs mt-0.5" style={{ color: 'var(--color-text-tertiary)' }}>
+        <div style={{ fontSize: 12, marginTop: 2, color: '#999' }}>
           ¥ {fund.amount.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </div>
       </div>
 
-      {/* 列2：当日收益 (金额 / 涨幅%) */}
-      <div className="text-right">
+      {/* Col 2: Daily profit */}
+      <div style={{ textAlign: 'right' }}>
         {dailyProfit !== null ? (
           <>
-            <div className={`text-[15px] font-bold ${dailyGrowth >= 0 ? 'text-profit' : 'text-loss'}`}>
+            <div style={{ fontSize: 15, fontWeight: 600, color: dailyGrowth >= 0 ? up : down }}>
               {dailyProfit >= 0 ? '+' : ''}{dailyProfit.toFixed(2)}
             </div>
-            <div className={`text-xs mt-0.5 ${dailyGrowth >= 0 ? 'text-profit' : 'text-loss'}`}>
+            <div style={{ fontSize: 12, marginTop: 2, color: dailyGrowth >= 0 ? up : down }}>
               {dailyGrowth >= 0 ? '+' : ''}{dailyGrowth.toFixed(2)}%
             </div>
           </>
         ) : (
           <>
-            <div className="text-sm" style={{ color: '#DDD' }}>-</div>
-            <div className="text-xs mt-0.5" style={{ color: '#DDD' }}>-</div>
+            <div style={{ fontSize: 14, color: '#ddd' }}>-</div>
+            <div style={{ fontSize: 12, marginTop: 2, color: '#ddd' }}>-</div>
           </>
         )}
       </div>
 
-      {/* 列3：持有收益 (金额 / 收益率%) */}
-      <div className="text-right">
-        <div className={`text-[15px] font-bold ${totalProfit >= 0 ? 'text-profit' : 'text-loss'}`}>
+      {/* Col 3: Total profit */}
+      <div style={{ textAlign: 'right' }}>
+        <div style={{ fontSize: 15, fontWeight: 600, color: totalProfit >= 0 ? up : down }}>
           {totalProfit >= 0 ? '+' : ''}{totalProfit.toFixed(2)}
         </div>
-        <div className={`text-xs mt-0.5 ${totalProfitRate >= 0 ? 'text-profit' : 'text-loss'}`}>
+        <div style={{ fontSize: 12, marginTop: 2, color: totalProfitRate >= 0 ? up : down }}>
           {totalProfitRate >= 0 ? '+' : ''}{totalProfitRate.toFixed(2)}%
         </div>
       </div>

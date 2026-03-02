@@ -1,16 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  /* === Color System === */
-  --color-profit: #E74C3C;
-  --color-loss: #27AE60;
-  --color-bg: #F4F5F7;
+  --color-profit: #e94560;
+  --color-loss: #22c55e;
+  --color-bg: #f5f6fa;
   --color-card: #FFFFFF;
-  --color-text-primary: #1A1A1A;
+  --color-text-primary: #1a1a2e;
   --color-text-secondary: #666666;
   --color-text-tertiary: #999999;
   --color-border: #EEEEEE;
-  --color-accent: #2563EB;
+  --color-accent: #764ba2;
+  --gradient-header: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
 * {
@@ -26,14 +26,14 @@ html {
 }
 
 body {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, 'PingFang SC',
-    'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC',
+    'Helvetica Neue', 'Noto Sans CJK SC', sans-serif;
   background-color: var(--color-bg);
   color: var(--color-text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.5;
-  font-feature-settings: 'tnum'; /* 等宽数字 */
+  font-feature-settings: 'tnum';
 }
 
 /* === Utility Colors === */
@@ -43,6 +43,114 @@ body {
 /* === Safe Area === */
 .safe-bottom {
   padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* === App Shell === */
+.app-shell {
+  max-width: 430px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: var(--color-bg);
+  position: relative;
+}
+
+/* === Gradient Header === */
+.gradient-header {
+  background: var(--gradient-header);
+  padding: 20px 20px 28px;
+  border-radius: 0 0 24px 24px;
+  color: #fff;
+}
+
+/* === Pill Tab === */
+.pill-tab {
+  padding: 7px 16px;
+  border-radius: 20px;
+  border: none;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+.pill-tab-active {
+  background: rgba(255, 255, 255, 0.95);
+  color: #764ba2;
+  font-weight: 600;
+}
+.pill-tab-inactive {
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 400;
+}
+.pill-tab-add {
+  padding: 7px 14px;
+  border-radius: 20px;
+  border: 1.5px dashed rgba(255, 255, 255, 0.4);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* === Account Card === */
+.account-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 18px 20px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.account-card:active {
+  transform: scale(0.985);
+}
+
+/* === Fund Card in List === */
+.fund-grid {
+  display: grid;
+  grid-template-columns: 1fr 88px 88px;
+  align-items: baseline;
+  gap: 0;
+}
+
+/* === Dashed Add Button === */
+.dashed-add-btn {
+  width: 100%;
+  margin-top: 12px;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1.5px dashed #d0d5dd;
+  background: transparent;
+  color: #999;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.dashed-add-btn:active {
+  background: #f9f9f9;
+}
+
+/* === Gradient Button === */
+.gradient-btn {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.gradient-btn:active {
+  opacity: 0.9;
+}
+.gradient-btn:disabled {
+  opacity: 0.4;
 }
 
 /* === Animations === */
@@ -57,7 +165,6 @@ body {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
-
 .skeleton {
   background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
   background-size: 200% 100%;
@@ -69,11 +176,3 @@ body {
 /* === Scrollbar === */
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-/* === Fund List Grid (精确列对齐) === */
-.fund-grid {
-  display: grid;
-  grid-template-columns: 1fr 88px 88px;
-  align-items: baseline;
-  gap: 0;
-}

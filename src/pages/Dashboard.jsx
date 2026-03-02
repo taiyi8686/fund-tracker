@@ -1,12 +1,18 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import Header from '../components/Header';
-import AssetSummary from '../components/AssetSummary';
 import AccountCard from '../components/AccountCard';
 import FundCard from '../components/FundCard';
 import { getAccounts, getAllFundCodes, getAllFundsAggregated } from '../utils/storage';
 import { fetchMultipleFundEstimates } from '../utils/fundApi';
 import { getCurrentUser, logout } from '../utils/auth';
+
+const ICON_GRADIENTS = [
+  'linear-gradient(135deg, #1677ff, #4096ff)',
+  'linear-gradient(135deg, #ff6b35, #ffa726)',
+  'linear-gradient(135deg, #9333ea, #c084fc)',
+  'linear-gradient(135deg, #06b6d4, #67e8f9)',
+  'linear-gradient(135deg, #e94560, #f472b6)',
+];
 
 export default function Dashboard() {
   const [accounts, setAccounts] = useState([]);
@@ -51,204 +57,231 @@ export default function Dashboard() {
   const allFunds = accounts.flatMap(a => a.funds);
   const aggregatedFunds = useMemo(() => getAllFundsAggregated(), [accounts]);
 
+  // Summary calculation based on active view
+  const summaryFunds = currentAccount ? currentAccount.funds : allFunds;
+  let totalAmount = 0;
+  let totalDailyProfit = 0;
+  let hasDailyData = false;
+
+  summaryFunds.forEach((fund) => {
+    totalAmount += fund.amount;
+    const est = estimates[fund.code];
+    if (est) {
+      totalDailyProfit += fund.amount * (est.estimateGrowth / 100);
+      hasDailyData = true;
+    }
+  });
+
+  const dailyRate = totalAmount > 0 ? (totalDailyProfit / totalAmount) * 100 : 0;
+  const isDailyUp = totalDailyProfit >= 0;
+
   const dateStr = (() => {
     const d = new Date();
     return `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   })();
 
-  // 标签项组件
-  const TabItem = ({ id, label }) => {
-    const isActive = activeTab === id;
-    return (
-      <button
-        onClick={() => setTab(id)}
-        className="relative px-5 py-3 whitespace-nowrap cursor-pointer transition-colors duration-150"
-        style={{
-          fontSize: '15px',
-          fontWeight: isActive ? 700 : 400,
-          color: isActive ? 'var(--color-text-primary)' : 'var(--color-text-tertiary)',
-        }}
-      >
-        {label}
-        {isActive && (
-          <span
-            className="absolute bottom-0 left-1/2 -translate-x-1/2 rounded-full"
-            style={{ width: '24px', height: '2.5px', backgroundColor: 'var(--color-text-primary)' }}
-          />
-        )}
-      </button>
-    );
-  };
+  const tabItems = [
+    { id: 'summary', label: '账户汇总' },
+    { id: 'all', label: '全部' },
+    ...accounts.map(acc => ({ id: acc.id, label: acc.name })),
+  ];
 
-  // 基金列表头 + 行（全部/单账户 共用）
   const FundListSection = ({ funds, accountId }) => (
     <>
-      {/* 列头 */}
+      {/* Column Header */}
       <div
-        className="fund-grid px-5 py-2"
-        style={{ backgroundColor: 'var(--color-bg)', borderBottom: '1px solid var(--color-border)' }}
+        className="fund-grid"
+        style={{ padding: '10px 20px', borderBottom: '1px solid rgba(0,0,0,0.06)' }}
       >
         <div />
-        <div className="text-right">
-          <div className="text-[11px] leading-tight" style={{ color: 'var(--color-text-tertiary)' }}>当日收益</div>
-          <div className="text-[11px] leading-tight" style={{ color: 'var(--color-text-tertiary)' }}>{dateStr}</div>
+        <div style={{ textAlign: 'right' }}>
+          <div style={{ fontSize: 11, color: '#999', lineHeight: 1.4 }}>当日收益</div>
+          <div style={{ fontSize: 11, color: '#bbb', lineHeight: 1.4 }}>{dateStr}</div>
         </div>
-        <div className="text-right">
-          <div className="text-[11px] leading-tight" style={{ color: 'var(--color-text-tertiary)' }}>持有收益</div>
-          <div className="text-[11px] leading-tight" style={{ color: 'var(--color-text-tertiary)' }}>{dateStr}</div>
+        <div style={{ textAlign: 'right' }}>
+          <div style={{ fontSize: 11, color: '#999', lineHeight: 1.4 }}>持有收益</div>
+          <div style={{ fontSize: 11, color: '#bbb', lineHeight: 1.4 }}>{dateStr}</div>
         </div>
       </div>
 
-      {/* 基金行 */}
-      <div className="bg-white">
-        {funds.map((fund, i) => (
-          <div key={fund.code}>
-            <FundCard
-              fund={fund}
-              estimate={estimates[fund.code]}
-              accountId={accountId}
-              clickable={!!accountId}
-            />
-            {i < funds.length - 1 && (
-              <div className="mx-5" style={{ borderBottom: '1px solid var(--color-border)' }} />
-            )}
-          </div>
-        ))}
-      </div>
+      {/* Fund Rows */}
+      {funds.map((fund, i) => (
+        <div key={fund.code}>
+          <FundCard
+            fund={fund}
+            estimate={estimates[fund.code]}
+            accountId={accountId}
+            clickable={!!accountId}
+          />
+          {i < funds.length - 1 && (
+            <div style={{ margin: '0 20px', borderBottom: '1px solid rgba(0,0,0,0.06)' }} />
+          )}
+        </div>
+      ))}
     </>
   );
 
   return (
-    <div className="min-h-screen safe-bottom" style={{ backgroundColor: 'var(--color-bg)' }}>
-      <Header
-        title="太一基金小助手"
-        leftContent={
-          <button onClick={handleLogout} className="text-xs cursor-pointer" style={{ color: 'var(--color-text-tertiary)' }}>退出</button>
-        }
-        rightAction={
-          <div className="flex items-center gap-2">
-            <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>{username}</span>
-            <button onClick={loadData} disabled={loading} className="cursor-pointer" style={{ color: 'var(--color-text-tertiary)' }}>
+    <div className="app-shell safe-bottom">
+      {/* ===== Gradient Header ===== */}
+      <div className="gradient-header">
+        {/* Title Bar */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+          <span style={{ fontSize: 17, fontWeight: 600 }}>太一基金小助手</span>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+            <button
+              onClick={handleLogout}
+              style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)', background: 'none', border: 'none', cursor: 'pointer' }}
+            >
+              退出
+            </button>
+            <span style={{ fontSize: 14, opacity: 0.85 }}>{username}</span>
+            <button
+              onClick={loadData}
+              disabled={loading}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#fff', opacity: 0.85, padding: 0, display: 'flex' }}
+            >
               <svg className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                   d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
             </button>
           </div>
-        }
-      />
+        </div>
 
-      {/* ===== 标签栏 ===== */}
-      <div
-        className="flex items-center bg-white overflow-x-auto no-scrollbar pl-2"
-        style={{ borderBottom: '1px solid var(--color-border)' }}
-      >
-        <TabItem id="summary" label="账户汇总" />
-        <TabItem id="all" label="全部" />
-        {accounts.map(acc => (
-          <TabItem key={acc.id} id={acc.id} label={acc.name} />
-        ))}
-        <button
-          onClick={() => navigate('/add-account')}
-          className="px-5 py-3 text-lg leading-none whitespace-nowrap cursor-pointer"
-          style={{ color: 'var(--color-text-tertiary)' }}
-        >
-          +
-        </button>
+        {/* Pill Tabs */}
+        <div style={{ display: 'flex', gap: 8, marginBottom: 24, overflowX: 'auto', paddingBottom: 4 }} className="no-scrollbar">
+          {tabItems.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setTab(tab.id)}
+              className={`pill-tab ${activeTab === tab.id ? 'pill-tab-active' : 'pill-tab-inactive'}`}
+            >
+              {tab.label}
+            </button>
+          ))}
+          <button onClick={() => navigate('/add-account')} className="pill-tab-add">
+            + 新增
+          </button>
+        </div>
+
+        {/* Asset Summary */}
+        <div>
+          <div style={{ fontSize: 12, opacity: 0.7, marginBottom: 4, letterSpacing: 0.5 }}>
+            账户资产 (元)
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+            <span style={{ fontSize: 36, fontWeight: 700, letterSpacing: -1 }}>
+              {totalAmount.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </span>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: 11, opacity: 0.7, marginBottom: 2 }}>当日收益</div>
+              {hasDailyData ? (
+                <div>
+                  <span style={{ fontSize: 22, fontWeight: 600, color: isDailyUp ? '#7cffb2' : '#ff6b6b' }}>
+                    {isDailyUp ? '+' : ''}{totalDailyProfit.toFixed(2)}
+                  </span>
+                  <span style={{ fontSize: 12, marginLeft: 4, opacity: 0.8, color: isDailyUp ? '#7cffb2' : '#ff6b6b' }}>
+                    {isDailyUp ? '+' : ''}{dailyRate.toFixed(2)}%
+                  </span>
+                </div>
+              ) : loading ? (
+                <div className="skeleton" style={{ width: 80, height: 28, opacity: 0.3 }} />
+              ) : (
+                <span style={{ fontSize: 22, fontWeight: 600, opacity: 0.4 }}>--</span>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* ===== 账户汇总 ===== */}
+      {/* ===== Content Area ===== */}
+
+      {/* 账户汇总 */}
       {activeTab === 'summary' && (
-        <>
-          <AssetSummary funds={allFunds} estimates={estimates} loading={loading} />
-
+        <div style={{ padding: '16px 16px 32px' }}>
           {accounts.length > 0 ? (
-            <div className="mt-2">
-              {accounts.map((acc, i) => (
-                <div key={acc.id}>
-                  {i > 0 && <div className="h-2" style={{ backgroundColor: 'var(--color-bg)' }} />}
-                  <AccountCard account={acc} estimates={estimates} onClick={() => setTab(acc.id)} />
-                </div>
-              ))}
-
-              <div className="h-2" style={{ backgroundColor: 'var(--color-bg)' }} />
-              <div className="bg-white px-5 py-3">
-                <button
-                  onClick={() => navigate('/add-account')}
-                  className="text-sm cursor-pointer"
-                  style={{ color: 'var(--color-text-secondary)' }}
-                >
-                  + 新增账户
-                </button>
+            <>
+              <div style={{ fontSize: 15, fontWeight: 600, color: '#333', marginBottom: 12, paddingLeft: 4 }}>
+                账户明细
               </div>
-            </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {accounts.map((acc, i) => (
+                  <AccountCard
+                    key={acc.id}
+                    account={acc}
+                    estimates={estimates}
+                    onClick={() => setTab(acc.id)}
+                    iconGradient={ICON_GRADIENTS[i % ICON_GRADIENTS.length]}
+                  />
+                ))}
+              </div>
+              <button onClick={() => navigate('/add-account')} className="dashed-add-btn">
+                <span style={{ fontSize: 18 }}>+</span>
+                新增账户
+              </button>
+            </>
           ) : (
-            <div className="flex flex-col items-center justify-center mt-24 px-8">
-              <svg className="w-20 h-20 mb-5" style={{ color: '#E0E0E0' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 60, padding: '0 32px' }}>
+              <svg style={{ width: 72, height: 72, marginBottom: 16, color: '#ddd' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1}
                   d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
               </svg>
-              <p className="text-[15px] mb-2" style={{ color: 'var(--color-text-tertiary)' }}>还没有添加账户</p>
-              <p className="text-xs mb-6" style={{ color: '#CCC' }}>先创建一个账户，比如「支付宝」</p>
+              <p style={{ fontSize: 15, color: '#999', marginBottom: 6 }}>还没有添加账户</p>
+              <p style={{ fontSize: 12, color: '#ccc', marginBottom: 24 }}>先创建一个账户，比如「支付宝」</p>
               <button
                 onClick={() => navigate('/add-account')}
-                className="px-8 py-3 text-white rounded-lg text-[15px] font-medium cursor-pointer active:opacity-90 transition-opacity"
-                style={{ backgroundColor: 'var(--color-accent)' }}
+                className="gradient-btn"
+                style={{ padding: '12px 32px', fontSize: 15 }}
               >
                 + 新建账户
               </button>
             </div>
           )}
-        </>
+        </div>
       )}
 
-      {/* ===== 全部（跨账户聚合） ===== */}
+      {/* 全部（跨账户聚合） */}
       {activeTab === 'all' && (
-        <>
-          <AssetSummary funds={allFunds} estimates={estimates} loading={loading} />
+        <div style={{ padding: '16px 16px 32px' }}>
           {aggregatedFunds.length > 0 ? (
-            <FundListSection funds={aggregatedFunds} accountId={null} />
+            <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px rgba(0,0,0,0.04)', overflow: 'hidden' }}>
+              <FundListSection funds={aggregatedFunds} accountId={null} />
+            </div>
           ) : (
-            <div className="flex flex-col items-center justify-center mt-24">
-              <p className="text-[15px]" style={{ color: 'var(--color-text-tertiary)' }}>还没有添加基金</p>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 60 }}>
+              <p style={{ fontSize: 15, color: '#999' }}>还没有添加基金</p>
             </div>
           )}
-        </>
+        </div>
       )}
 
-      {/* ===== 单个账户 ===== */}
+      {/* 单个账户 */}
       {currentAccount && (
-        <>
-          <AssetSummary funds={currentAccount.funds} estimates={estimates} loading={loading} />
-
+        <div style={{ padding: '16px 16px 32px' }}>
           {currentAccount.funds.length > 0 ? (
             <>
-              <FundListSection funds={currentAccount.funds} accountId={currentAccount.id} />
-
-              <div className="h-2" style={{ backgroundColor: 'var(--color-bg)' }} />
-              <div className="bg-white px-5 py-3 flex justify-between">
-                <button
-                  onClick={() => navigate(`/add/${currentAccount.id}`)}
-                  className="text-sm cursor-pointer"
-                  style={{ color: 'var(--color-text-secondary)' }}
-                >
-                  + 新增持有
-                </button>
+              <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px rgba(0,0,0,0.04)', overflow: 'hidden' }}>
+                <FundListSection funds={currentAccount.funds} accountId={currentAccount.id} />
               </div>
+              <button onClick={() => navigate(`/add/${currentAccount.id}`)} className="dashed-add-btn">
+                <span style={{ fontSize: 18 }}>+</span>
+                新增持有
+              </button>
             </>
           ) : (
-            <div className="flex flex-col items-center justify-center mt-24 px-8">
-              <p className="text-[15px] mb-5" style={{ color: 'var(--color-text-tertiary)' }}>该账户还没有添加基金</p>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 60 }}>
+              <p style={{ fontSize: 15, color: '#999', marginBottom: 20 }}>该账户还没有添加基金</p>
               <button
                 onClick={() => navigate(`/add/${currentAccount.id}`)}
-                className="px-6 py-2.5 text-white rounded-lg text-sm font-medium cursor-pointer active:opacity-90 transition-opacity"
-                style={{ backgroundColor: 'var(--color-accent)' }}
+                className="gradient-btn"
+                style={{ padding: '10px 24px', fontSize: 14 }}
               >
                 + 新增持有
               </button>
             </div>
           )}
-        </>
+        </div>
       )}
     </div>
   );

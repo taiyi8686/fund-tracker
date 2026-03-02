@@ -17,22 +17,23 @@ export default function AddAccount() {
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg)' }}>
+    <div className="app-shell" style={{ background: '#f5f6fa' }}>
       <Header title="新建账户" showBack />
 
-      <div className="p-4 space-y-4">
+      <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
         <div>
-          <div className="text-xs mb-2.5" style={{ color: 'var(--color-text-secondary)' }}>快捷选择</div>
-          <div className="grid grid-cols-2 gap-2.5">
+          <div style={{ fontSize: 13, marginBottom: 10, color: '#666', paddingLeft: 4 }}>快捷选择</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             {PLATFORMS.map((p) => (
               <button
                 key={p}
                 onClick={() => setName(p)}
-                className="py-3 px-4 rounded-lg text-sm text-left cursor-pointer transition-colors duration-150"
                 style={{
-                  backgroundColor: name === p ? '#EFF6FF' : 'white',
-                  border: `1px solid ${name === p ? 'var(--color-accent)' : 'var(--color-border)'}`,
-                  color: name === p ? 'var(--color-accent)' : 'var(--color-text-primary)',
+                  padding: '12px 16px', borderRadius: 12, fontSize: 14, textAlign: 'left',
+                  cursor: 'pointer', transition: 'all 0.15s',
+                  background: name === p ? 'rgba(118,75,162,0.08)' : '#fff',
+                  border: `1.5px solid ${name === p ? '#764ba2' : '#eee'}`,
+                  color: name === p ? '#764ba2' : '#1a1a2e',
                   fontWeight: name === p ? 500 : 400,
                 }}
               >
@@ -43,16 +44,15 @@ export default function AddAccount() {
         </div>
 
         <div>
-          <div className="text-xs mb-2.5" style={{ color: 'var(--color-text-secondary)' }}>自定义名称</div>
+          <div style={{ fontSize: 13, marginBottom: 10, color: '#666', paddingLeft: 4 }}>自定义名称</div>
           <input
             type="text" value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="请输入账户名称"
-            className="w-full px-4 py-3 rounded-lg text-[15px] outline-none"
             style={{
-              backgroundColor: 'white',
-              border: '1px solid var(--color-border)',
-              color: 'var(--color-text-primary)',
+              width: '100%', padding: '12px 16px', borderRadius: 12,
+              border: '1.5px solid #eee', fontSize: 15, outline: 'none',
+              background: '#fff', color: '#1a1a2e', boxSizing: 'border-box',
             }}
           />
         </div>
@@ -60,8 +60,8 @@ export default function AddAccount() {
         <button
           onClick={handleSubmit}
           disabled={!name.trim()}
-          className="w-full py-3 text-white rounded-lg text-[15px] font-medium disabled:opacity-40 cursor-pointer active:opacity-90 transition-opacity"
-          style={{ backgroundColor: 'var(--color-accent)' }}
+          className="gradient-btn"
+          style={{ width: '100%', padding: '12px 0', fontSize: 15 }}
         >
           下一步
         </button>
