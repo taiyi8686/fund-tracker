@@ -3,20 +3,24 @@
 :root {
   --profit-color: #E74C3C;
   --loss-color: #27AE60;
+  --bg-color: #F5F6FA;
+  --card-radius: 12px;
 }
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
     'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
-  background-color: #f5f6fa;
+  background-color: var(--bg-color);
   color: #333;
   -webkit-font-smoothing: antialiased;
+  font-size: 16px;
 }
 
 .text-profit {
@@ -27,8 +31,12 @@ body {
   color: var(--loss-color);
 }
 
-.bg-gradient-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+.bg-profit-light {
+  background-color: #FDF2F2;
+}
+
+.bg-loss-light {
+  background-color: #F0FAF4;
 }
 
 /* Safe area for mobile */
@@ -60,4 +68,22 @@ body {
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
   border-radius: 4px;
+}
+
+/* Tab active underline */
+.tab-active {
+  position: relative;
+  color: #3B82F6;
+  font-weight: 600;
+}
+.tab-active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 3px;
+  background-color: #3B82F6;
+  border-radius: 2px;
 }

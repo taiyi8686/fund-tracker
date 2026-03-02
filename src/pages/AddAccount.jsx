@@ -21,19 +21,19 @@ export default function AddAccount() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#F5F6FA]">
       <Header title="新建账户" showBack />
 
-      <div className="px-4 mt-4 space-y-5">
+      <div className="px-4 mt-3 space-y-4">
         {/* 快捷选择 */}
         <div>
-          <div className="text-sm text-gray-500 mb-3">快捷选择</div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="text-[13px] text-gray-500 mb-2.5">快捷选择</div>
+          <div className="grid grid-cols-2 gap-2.5">
             {PLATFORMS.map((p) => (
               <button
                 key={p}
                 onClick={() => handleQuickSelect(p)}
-                className={`py-3 px-4 rounded-xl border text-sm text-left transition-colors ${
+                className={`py-3 px-4 rounded-xl border text-[14px] text-left transition-colors ${
                   name === p
                     ? 'border-blue-500 bg-blue-50 text-blue-600'
                     : 'border-gray-200 bg-white text-gray-700 active:bg-gray-50'
@@ -47,20 +47,20 @@ export default function AddAccount() {
 
         {/* 自定义名称 */}
         <div>
-          <div className="text-sm text-gray-500 mb-3">自定义名称</div>
+          <div className="text-[13px] text-gray-500 mb-2.5">自定义名称</div>
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="请输入账户名称"
-            className="w-full px-4 py-3 bg-white rounded-xl border border-gray-200 text-base outline-none focus:ring-2 focus:ring-blue-200"
+            className="w-full px-4 py-3 bg-white rounded-xl border border-gray-200 text-[15px] outline-none focus:ring-2 focus:ring-blue-200"
           />
         </div>
 
         <button
           onClick={handleSubmit}
           disabled={!name.trim()}
-          className="w-full py-3 bg-blue-500 text-white rounded-xl font-medium disabled:opacity-40 active:bg-blue-600 transition-colors"
+          className="w-full py-3 bg-blue-500 text-white rounded-xl text-[15px] font-medium disabled:opacity-40 active:bg-blue-600 transition-colors"
         >
           下一步
         </button>

@@ -82,17 +82,17 @@ export default function AddFund() {
   if (!account) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#F5F6FA]">
       <Header title={`${editCode ? '编辑' : '新增'}持有 · ${account.name}`} showBack />
 
-      <div className="px-4 mt-4">
-        <div className="bg-white rounded-xl p-5 shadow-sm space-y-5">
+      <div className="px-4 mt-3">
+        <div className="bg-white rounded-xl px-5 py-4 space-y-4">
           {/* 基金名称 */}
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <span className="text-sm font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-md whitespace-nowrap">基金名称</span>
+              <span className="text-[13px] font-medium text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg whitespace-nowrap">基金名称</span>
               {confirmed && fundName ? (
-                <span className="text-sm text-gray-800 truncate">{fundName}</span>
+                <span className="text-[14px] text-gray-800 truncate">{fundName}</span>
               ) : (
                 <input
                   type="text"
@@ -101,7 +101,7 @@ export default function AddFund() {
                   onChange={handleCodeChange}
                   placeholder="请输入基金代码，如 002207"
                   disabled={!!editCode}
-                  className="flex-1 text-sm text-gray-800 outline-none bg-transparent placeholder-gray-300 disabled:opacity-60"
+                  className="flex-1 text-[14px] text-gray-800 outline-none bg-transparent placeholder-gray-300 disabled:opacity-60"
                 />
               )}
             </div>
@@ -109,18 +109,18 @@ export default function AddFund() {
               <button
                 onClick={searchFund}
                 disabled={searching || code.length !== 6}
-                className="w-full py-2.5 bg-blue-500 text-white rounded-lg text-sm font-medium disabled:opacity-40 active:bg-blue-600"
+                className="w-full py-2.5 bg-blue-500 text-white rounded-lg text-[14px] font-medium disabled:opacity-40 active:bg-blue-600"
               >
                 {searching ? '查询中...' : '查询基金'}
               </button>
             )}
             {searchError && (
-              <p className="text-red-500 text-xs mt-2">{searchError}</p>
+              <p className="text-red-500 text-[12px] mt-2">{searchError}</p>
             )}
             {confirmed && !editCode && (
               <button
                 onClick={() => { setConfirmed(false); setFundName(''); setCode(''); }}
-                className="text-xs text-blue-500 mt-1"
+                className="text-[12px] text-blue-500 mt-1"
               >
                 重新选择基金
               </button>
@@ -131,26 +131,26 @@ export default function AddFund() {
             <>
               <div className="border-t border-gray-100" />
               <div className="flex items-center gap-3">
-                <span className="text-sm font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-md whitespace-nowrap">持有金额</span>
+                <span className="text-[13px] font-medium text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg whitespace-nowrap">持有金额</span>
                 <input
                   type="text"
                   inputMode="decimal"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value.replace(/[^\d.]/g, ''))}
                   placeholder="输入该基金的持有金额"
-                  className="flex-1 text-sm text-gray-800 outline-none bg-transparent placeholder-gray-300"
+                  className="flex-1 text-[14px] text-gray-800 outline-none bg-transparent placeholder-gray-300"
                 />
               </div>
               <div className="border-t border-gray-100" />
               <div className="flex items-center gap-3">
-                <span className="text-sm font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-md whitespace-nowrap">持有收益</span>
+                <span className="text-[13px] font-medium text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg whitespace-nowrap">持有收益</span>
                 <input
                   type="text"
                   inputMode="decimal"
                   value={profit}
                   onChange={(e) => setProfit(e.target.value.replace(/[^\d.\-]/g, ''))}
                   placeholder="亏损填负数，如 -457"
-                  className="flex-1 text-sm text-gray-800 outline-none bg-transparent placeholder-gray-300"
+                  className="flex-1 text-[14px] text-gray-800 outline-none bg-transparent placeholder-gray-300"
                 />
               </div>
             </>
@@ -161,7 +161,7 @@ export default function AddFund() {
           <button
             onClick={handleSubmit}
             disabled={!canSubmit}
-            className="w-full mt-5 py-3 bg-blue-500 text-white rounded-xl font-medium disabled:opacity-40 active:bg-blue-600 transition-colors"
+            className="w-full mt-4 py-3 bg-blue-500 text-white rounded-xl text-[15px] font-medium disabled:opacity-40 active:bg-blue-600 transition-colors"
           >
             完成
           </button>

@@ -61,17 +61,17 @@ export default function Dashboard() {
   })();
 
   return (
-    <div className="min-h-screen bg-gray-50 safe-bottom">
+    <div className="min-h-screen bg-[#F5F6FA] safe-bottom">
       <Header
         title="太一基金小助手"
         leftContent={
-          <button onClick={handleLogout} className="text-sm text-gray-400">退出</button>
+          <button onClick={handleLogout} className="text-[13px] text-gray-400">退出</button>
         }
         rightAction={
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-400">{username}</span>
-            <button onClick={loadData} disabled={loading} className="text-gray-500">
-              <svg className={`w-6 h-6 ${loading ? 'animate-spin' : ''}`}
+          <div className="flex items-center gap-2.5">
+            <span className="text-[13px] text-gray-400">{username}</span>
+            <button onClick={loadData} disabled={loading} className="text-gray-400">
+              <svg className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`}
                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                   d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -82,13 +82,13 @@ export default function Dashboard() {
       />
 
       {/* 标签栏 */}
-      <div className="flex items-center bg-white border-b border-gray-100 overflow-x-auto no-scrollbar px-2">
+      <div className="flex items-center bg-white border-b border-gray-100 overflow-x-auto no-scrollbar">
         <button
           onClick={() => setTab('summary')}
-          className={`px-4 py-3 text-base whitespace-nowrap border-b-2 transition-colors ${
+          className={`relative px-5 py-3 text-[15px] whitespace-nowrap transition-colors ${
             activeTab === 'summary'
-              ? 'border-blue-500 text-blue-600 font-semibold'
-              : 'border-transparent text-gray-500'
+              ? 'tab-active'
+              : 'text-gray-500'
           }`}
         >
           账户汇总
@@ -97,10 +97,10 @@ export default function Dashboard() {
           <button
             key={acc.id}
             onClick={() => setTab(acc.id)}
-            className={`px-4 py-3 text-base whitespace-nowrap border-b-2 transition-colors ${
+            className={`relative px-5 py-3 text-[15px] whitespace-nowrap transition-colors ${
               activeTab === acc.id
-                ? 'border-blue-500 text-blue-600 font-semibold'
-                : 'border-transparent text-gray-500'
+                ? 'tab-active'
+                : 'text-gray-500'
             }`}
           >
             {acc.name}
@@ -108,7 +108,7 @@ export default function Dashboard() {
         ))}
         <button
           onClick={() => navigate('/add-account')}
-          className="px-4 py-3 text-gray-400 text-xl leading-none whitespace-nowrap"
+          className="px-4 py-3 text-gray-300 text-[20px] leading-none whitespace-nowrap"
         >
           +
         </button>
@@ -120,7 +120,7 @@ export default function Dashboard() {
           <AssetSummary funds={allFunds} estimates={estimates} loading={loading} />
 
           {accounts.length > 0 ? (
-            <div className="px-4 mt-4 space-y-4 pb-8">
+            <div className="px-4 mt-3 space-y-3 pb-8">
               {accounts.map(acc => (
                 <AccountCard
                   key={acc.id}
@@ -131,9 +131,9 @@ export default function Dashboard() {
               ))}
               <button
                 onClick={() => navigate('/add-account')}
-                className="w-full py-3 text-base text-blue-500 flex items-center justify-center gap-1"
+                className="w-full py-3 text-[15px] text-blue-500 bg-white rounded-xl flex items-center justify-center gap-1 active:bg-gray-50"
               >
-                <span className="text-xl leading-none">+</span> 新增账户
+                <span className="text-[18px] leading-none">+</span> 新增账户
               </button>
             </div>
           ) : (
@@ -142,11 +142,11 @@ export default function Dashboard() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1}
                   d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
               </svg>
-              <p className="text-gray-400 text-base mb-2">还没有添加账户</p>
-              <p className="text-gray-300 text-sm mb-6">先创建一个账户，比如「支付宝」</p>
+              <p className="text-gray-400 text-[15px] mb-2">还没有添加账户</p>
+              <p className="text-gray-300 text-[13px] mb-6">先创建一个账户，比如「支付宝」</p>
               <button
                 onClick={() => navigate('/add-account')}
-                className="px-8 py-3 bg-blue-500 text-white rounded-xl text-base font-medium active:bg-blue-600"
+                className="px-8 py-3 bg-blue-500 text-white rounded-xl text-[15px] font-medium active:bg-blue-600"
               >
                 + 新建账户
               </button>
@@ -163,7 +163,7 @@ export default function Dashboard() {
           {currentAccount.funds.length > 0 ? (
             <>
               {/* 表头 */}
-              <div className="flex items-center px-5 py-2.5 bg-gray-50 text-sm text-gray-400">
+              <div className="flex items-center px-5 py-2 bg-[#F5F6FA] text-[12px] text-gray-400">
                 <span className="flex-1">基金</span>
                 <span className="flex-1 text-center">当日收益 {dateStr}</span>
                 <span className="flex-1 text-right">持有收益</span>
@@ -181,7 +181,7 @@ export default function Dashboard() {
                       />
                     </div>
                     {i < currentAccount.funds.length - 1 && (
-                      <div className="border-b border-gray-100 mx-5" />
+                      <div className="border-b border-gray-50 mx-5" />
                     )}
                   </div>
                 ))}
@@ -189,16 +189,16 @@ export default function Dashboard() {
             </>
           ) : (
             <div className="flex flex-col items-center justify-center mt-24 px-8">
-              <p className="text-gray-400 text-base mb-5">该账户还没有添加基金</p>
+              <p className="text-gray-400 text-[15px] mb-5">该账户还没有添加基金</p>
             </div>
           )}
 
           <div className="px-5 py-4">
             <button
               onClick={() => navigate(`/add/${currentAccount.id}`)}
-              className="text-base text-blue-500 flex items-center gap-1"
+              className="text-[15px] text-blue-500 flex items-center gap-1"
             >
-              <span className="text-xl leading-none">+</span> 新增持有
+              <span className="text-[18px] leading-none">+</span> 新增持有
             </button>
           </div>
         </>
