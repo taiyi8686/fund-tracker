@@ -1,6 +1,10 @@
-import MiniChart from './MiniChart';
+import { useMemo } from 'react';
+import ProfitCurve from './ProfitCurve';
+import Badge from './Badge';
+import ProfitText from './ProfitText';
+import { generateCurveData } from '../utils/curveData';
 
-export default function AccountCard({ account, estimates, onClick, iconGradient }) {
+export default function AccountCard({ account, estimates, showFunds, onClick, onFundClick, iconGradient }) {
   let totalAmount = 0;
   let totalProfit = 0;
   let totalDailyProfit = 0;
@@ -21,87 +25,119 @@ export default function AccountCard({ account, estimates, onClick, iconGradient 
   });
 
   const totalCost = totalAmount - totalProfit;
-  const profitRate = totalCost > 0 ? (totalProfit / totalCost) * 100 : 0;
-  const dailyRate = totalAmount > 0 ? (totalDailyProfit / totalAmount) * 100 : 0;
+  const holdProfitPct = totalCost > 0 ? (totalProfit / totalCost) * 100 : 0;
+  const dayProfitPct = totalAmount > 0 ? (totalDailyProfit / totalAmount) * 100 : 0;
+  const acctPositive = totalDailyProfit >= 0;
+
+  const curveData = useMemo(
+    () => generateCurveData(account.id + account.name, acctPositive),
+    [account.id, account.name, acctPositive]
+  );
+
+  const fmt = (n) => n.toLocaleString("en", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   return (
-    <div onClick={onClick} className="account-card">
-      {/* Card Header: Icon + Name + Up/Down badges */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div
-            style={{
-              width: 32, height: 32, borderRadius: 10,
-              background: iconGradient || 'linear-gradient(135deg, #1677ff, #4096ff)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 14, color: '#fff', fontWeight: 600,
-            }}
-          >
-            {account.name.slice(-1)}
+    <div
+      style={{
+        background: "#fff", borderRadius: 16, marginBottom: 12,
+        boxShadow: "0 1px 8px rgba(0,0,0,0.04)", overflow: "hidden",
+      }}
+    >
+      {/* Account Header — clickable area */}
+      <div onClick={onClick} style={{ cursor: "pointer" }}>
+        <div style={{ padding: "14px 18px 0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div
+              style={{
+                width: 30, height: 30, borderRadius: 8,
+                background: iconGradient || "linear-gradient(135deg, #1677ff, #4096ff)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 13, color: "#fff", fontWeight: 600,
+              }}
+            >
+              {account.name.slice(-1)}
+            </div>
+            <span style={{ fontSize: 15, fontWeight: 600, color: "#1a1a2e" }}>{account.name}</span>
           </div>
-          <span style={{ fontSize: 15, fontWeight: 600, color: '#1a1a2e' }}>{account.name}</span>
-        </div>
-        <div style={{ display: 'flex', gap: 6 }}>
-          {upCount > 0 && (
-            <span style={{
-              fontSize: 12, color: '#e94560',
-              background: 'rgba(233,69,96,0.08)',
-              padding: '3px 8px', borderRadius: 8,
-            }}>
-              ↑{upCount}
-            </span>
-          )}
-          {downCount > 0 && (
-            <span style={{
-              fontSize: 12, color: '#22c55e',
-              background: 'rgba(34,197,94,0.08)',
-              padding: '3px 8px', borderRadius: 8,
-            }}>
-              ↓{downCount}
-            </span>
-          )}
-        </div>
-      </div>
-
-      {/* Card Body */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-        {/* Left: Assets + Hold Profit */}
-        <div>
-          <div style={{ fontSize: 11, color: '#999', marginBottom: 2 }}>账户资产</div>
-          <div style={{ fontSize: 26, fontWeight: 700, color: '#1a1a2e', letterSpacing: -0.5, lineHeight: 1.2 }}>
-            {totalAmount.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-          </div>
-          <div style={{ marginTop: 8 }}>
-            <span style={{ fontSize: 11, color: '#999', marginRight: 4 }}>持有收益</span>
-            <span style={{ fontSize: 14, fontWeight: 600, color: totalProfit >= 0 ? '#e94560' : '#22c55e' }}>
-              {totalProfit >= 0 ? '+' : ''}{totalProfit.toFixed(2)}
-            </span>
-            <span style={{ fontSize: 11, color: totalProfit >= 0 ? '#e94560' : '#22c55e', marginLeft: 4 }}>
-              {profitRate >= 0 ? '+' : ''}{profitRate.toFixed(2)}%
-            </span>
+          <div style={{ display: "flex", gap: 6 }}>
+            <Badge up count={upCount} />
+            <Badge up={false} count={downCount} />
           </div>
         </div>
 
-        {/* Right: MiniChart + Day Profit */}
-        <div style={{ textAlign: 'right' }}>
-          <MiniChart seed={account.id + account.name} isPositive={totalProfit >= 0} />
-          <div style={{ marginTop: 6 }}>
-            <span style={{ fontSize: 11, color: '#999' }}>当日 </span>
-            {hasDailyData ? (
-              <>
-                <span style={{ fontSize: 16, fontWeight: 600, color: totalDailyProfit >= 0 ? '#e94560' : '#22c55e' }}>
-                  {totalDailyProfit >= 0 ? '+' : ''}{totalDailyProfit.toFixed(2)}
-                </span>
-                <span style={{ fontSize: 11, color: totalDailyProfit >= 0 ? '#e94560' : '#22c55e', marginLeft: 3 }}>
-                  {dailyRate >= 0 ? '+' : ''}{dailyRate.toFixed(2)}%
-                </span>
-              </>
-            ) : (
-              <span className="skeleton" style={{ width: 60, height: 18, display: 'inline-block' }} />
-            )}
+        {/* Account Summary */}
+        <div style={{ padding: "10px 18px 14px", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+          <div>
+            <div style={{ fontSize: 11, color: "#999", marginBottom: 2 }}>账户资产</div>
+            <div style={{ fontSize: 24, fontWeight: 700, color: "#1a1a2e", letterSpacing: -0.5 }}>
+              {fmt(totalAmount)}
+            </div>
+            <div style={{ marginTop: 6, display: "flex", alignItems: "center", gap: 4 }}>
+              <span style={{ fontSize: 11, color: "#999" }}>持有收益</span>
+              <ProfitText value={totalProfit} pct={holdProfitPct} />
+            </div>
+          </div>
+          <div style={{ textAlign: "right" }}>
+            <ProfitCurve data={curveData} positive={acctPositive} width={120} height={40} />
+            <div style={{ marginTop: 4, display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 4 }}>
+              <span style={{ fontSize: 11, color: "#999" }}>当日收益</span>
+              {hasDailyData ? (
+                <ProfitText value={totalDailyProfit} pct={dayProfitPct} />
+              ) : (
+                <span className="skeleton" style={{ width: 60, height: 16, display: "inline-block" }} />
+              )}
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Fund list inside account card */}
+      {showFunds && account.funds.length > 0 && (
+        <div style={{ borderTop: "1px solid #f3f3f3" }}>
+          {account.funds.map((fund, fi) => {
+            const est = estimates[fund.code];
+            const dailyProfit = est ? fund.amount * (est.estimateGrowth / 100) : null;
+            const dailyGrowth = est ? est.estimateGrowth : null;
+            const holdProfit = fund.profit;
+            const cost = fund.amount - fund.profit;
+            const holdProfitPct = cost > 0 ? (holdProfit / cost) * 100 : 0;
+
+            return (
+              <div
+                key={fund.code}
+                onClick={() => onFundClick && onFundClick(account.id, fund.code)}
+                style={{
+                  padding: "12px 18px",
+                  borderBottom: fi < account.funds.length - 1 ? "1px solid #f8f8f8" : "none",
+                  cursor: "pointer",
+                  transition: "background 0.15s",
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: "#333" }}>
+                    {est?.name || fund.name || fund.code}
+                  </span>
+                  <span style={{ fontSize: 11, color: "#bbb" }}>{fund.code}</span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
+                    <span style={{ fontSize: 11, color: "#999" }}>当日</span>
+                    {dailyProfit !== null ? (
+                      <ProfitText value={dailyProfit} pct={dailyGrowth} />
+                    ) : (
+                      <span style={{ fontSize: 14, color: "#ddd" }}>--</span>
+                    )}
+                  </div>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
+                    <span style={{ fontSize: 11, color: "#999" }}>持有</span>
+                    <ProfitText value={holdProfit} pct={holdProfitPct} />
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

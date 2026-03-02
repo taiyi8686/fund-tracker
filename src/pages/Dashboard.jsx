@@ -1,8 +1,7 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import AccountCard from '../components/AccountCard';
-import FundCard from '../components/FundCard';
-import { getAccounts, getAllFundCodes, getAllFundsAggregated } from '../utils/storage';
+import { getAccounts, getAllFundCodes } from '../utils/storage';
 import { fetchMultipleFundEstimates } from '../utils/fundApi';
 import { getCurrentUser, logout } from '../utils/auth';
 
@@ -53,11 +52,22 @@ export default function Dashboard() {
     navigate('/login', { replace: true });
   };
 
-  const currentAccount = accounts.find(a => a.id === activeTab);
-  const allFunds = accounts.flatMap(a => a.funds);
-  const aggregatedFunds = useMemo(() => getAllFundsAggregated(), [accounts]);
+  // Tab items
+  const tabItems = [
+    { id: 'summary', label: '账户汇总' },
+    { id: 'all', label: '全部' },
+    ...accounts.map(acc => ({ id: acc.id, label: acc.name })),
+  ];
 
-  // Summary calculation based on active view
+  // Determine which accounts to display
+  const currentAccount = accounts.find(a => a.id === activeTab);
+  const displayAccounts = currentAccount ? [currentAccount] : accounts;
+
+  // Show funds inside cards?
+  const showFunds = activeTab !== 'summary';
+
+  // Total summary
+  const allFunds = accounts.flatMap(a => a.funds);
   const summaryFunds = currentAccount ? currentAccount.funds : allFunds;
   let totalAmount = 0;
   let totalDailyProfit = 0;
@@ -72,74 +82,45 @@ export default function Dashboard() {
     }
   });
 
-  const dailyRate = totalAmount > 0 ? (totalDailyProfit / totalAmount) * 100 : 0;
-  const isDailyUp = totalDailyProfit >= 0;
+  const isPositiveTotal = totalDailyProfit >= 0;
+  const fmt = (n) => n.toLocaleString("en", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-  const dateStr = (() => {
-    const d = new Date();
-    return `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-  })();
-
-  const tabItems = [
-    { id: 'summary', label: '账户汇总' },
-    { id: 'all', label: '全部' },
-    ...accounts.map(acc => ({ id: acc.id, label: acc.name })),
-  ];
-
-  const FundListSection = ({ funds, accountId }) => (
-    <>
-      {/* Column Header */}
-      <div
-        className="fund-grid"
-        style={{ padding: '10px 20px', borderBottom: '1px solid rgba(0,0,0,0.06)' }}
-      >
-        <div />
-        <div style={{ textAlign: 'right' }}>
-          <div style={{ fontSize: 11, color: '#999', lineHeight: 1.4 }}>当日收益</div>
-          <div style={{ fontSize: 11, color: '#bbb', lineHeight: 1.4 }}>{dateStr}</div>
-        </div>
-        <div style={{ textAlign: 'right' }}>
-          <div style={{ fontSize: 11, color: '#999', lineHeight: 1.4 }}>持有收益</div>
-          <div style={{ fontSize: 11, color: '#bbb', lineHeight: 1.4 }}>{dateStr}</div>
-        </div>
-      </div>
-
-      {/* Fund Rows */}
-      {funds.map((fund, i) => (
-        <div key={fund.code}>
-          <FundCard
-            fund={fund}
-            estimate={estimates[fund.code]}
-            accountId={accountId}
-            clickable={!!accountId}
-          />
-          {i < funds.length - 1 && (
-            <div style={{ margin: '0 20px', borderBottom: '1px solid rgba(0,0,0,0.06)' }} />
-          )}
-        </div>
-      ))}
-    </>
-  );
+  const handleFundClick = (accountId, fundCode) => {
+    navigate(`/fund/${accountId}/${fundCode}`);
+  };
 
   return (
-    <div className="app-shell safe-bottom">
+    <div
+      style={{
+        maxWidth: 430, margin: "0 auto", minHeight: "100vh",
+        background: "#f5f6fa",
+        fontFamily: '-apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif',
+      }}
+    >
       {/* ===== Gradient Header ===== */}
-      <div className="gradient-header">
-        {/* Title Bar */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+      <div
+        style={{
+          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+          padding: "16px 16px 24px",
+          borderRadius: "0 0 20px 20px",
+          color: "#fff",
+        }}
+      >
+        {/* Title bar */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
           <span style={{ fontSize: 17, fontWeight: 600 }}>太一基金小助手</span>
-          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
             <button
               onClick={handleLogout}
-              style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)', background: 'none', border: 'none', cursor: 'pointer' }}
+              style={{ fontSize: 12, color: "rgba(255,255,255,0.6)", background: "none", border: "none", cursor: "pointer" }}
             >
               退出
             </button>
-            <span style={{ fontSize: 14, opacity: 0.85 }}>{username}</span>
+            <span style={{ fontSize: 13, opacity: 0.8 }}>{username}</span>
             <button
               onClick={loadData}
               disabled={loading}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#fff', opacity: 0.85, padding: 0, display: 'flex' }}
+              style={{ background: "none", border: "none", cursor: "pointer", color: "#fff", opacity: 0.8, padding: 0, display: "flex" }}
             >
               <svg className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -150,139 +131,168 @@ export default function Dashboard() {
         </div>
 
         {/* Pill Tabs */}
-        <div style={{ display: 'flex', gap: 8, marginBottom: 24, overflowX: 'auto', paddingBottom: 4 }} className="no-scrollbar">
+        <div style={{ display: "flex", gap: 8, marginBottom: 20, overflowX: "auto", paddingBottom: 2 }} className="no-scrollbar">
           {tabItems.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setTab(tab.id)}
-              className={`pill-tab ${activeTab === tab.id ? 'pill-tab-active' : 'pill-tab-inactive'}`}
+              style={{
+                padding: "6px 14px", borderRadius: 18, border: "none",
+                fontSize: 13, fontWeight: activeTab === tab.id ? 600 : 400,
+                background: activeTab === tab.id ? "rgba(255,255,255,0.93)" : "rgba(255,255,255,0.15)",
+                color: activeTab === tab.id ? "#764ba2" : "rgba(255,255,255,0.85)",
+                cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0,
+                transition: "all 0.2s",
+              }}
             >
               {tab.label}
             </button>
           ))}
-          <button onClick={() => navigate('/add-account')} className="pill-tab-add">
-            + 新增
+          <button
+            onClick={() => navigate('/add-account')}
+            style={{
+              padding: "6px 12px", borderRadius: 18,
+              border: "1.5px dashed rgba(255,255,255,0.35)",
+              background: "transparent", color: "rgba(255,255,255,0.6)",
+              fontSize: 13, cursor: "pointer", flexShrink: 0,
+            }}
+          >
+            +
           </button>
         </div>
 
-        {/* Asset Summary */}
-        <div>
-          <div style={{ fontSize: 12, opacity: 0.7, marginBottom: 4, letterSpacing: 0.5 }}>
-            账户资产 (元)
+        {/* Total Summary */}
+        <div style={{ padding: "0 4px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+            <span style={{ fontSize: 12, opacity: 0.7 }}>账户资产</span>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-            <span style={{ fontSize: 36, fontWeight: 700, letterSpacing: -1 }}>
-              {totalAmount.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+            <span style={{ fontSize: 34, fontWeight: 700, letterSpacing: -1 }}>
+              {fmt(totalAmount)}
             </span>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: 11, opacity: 0.7, marginBottom: 2 }}>当日收益</div>
+            <div style={{ textAlign: "right" }}>
+              <div style={{ fontSize: 11, opacity: 0.6 }}>当日收益</div>
               {hasDailyData ? (
                 <div>
-                  <span style={{ fontSize: 22, fontWeight: 600, color: isDailyUp ? '#7cffb2' : '#ff6b6b' }}>
-                    {isDailyUp ? '+' : ''}{totalDailyProfit.toFixed(2)}
+                  <span style={{ fontSize: 20, fontWeight: 600, color: isPositiveTotal ? "#7cffb2" : "#ff9b9b" }}>
+                    {totalDailyProfit >= 0 ? "+" : ""}{totalDailyProfit.toFixed(2)}
                   </span>
-                  <span style={{ fontSize: 12, marginLeft: 4, opacity: 0.8, color: isDailyUp ? '#7cffb2' : '#ff6b6b' }}>
-                    {isDailyUp ? '+' : ''}{dailyRate.toFixed(2)}%
-                  </span>
+                  <span style={{ fontSize: 18, marginLeft: 6, cursor: "pointer", opacity: 0.7 }}>&gt;</span>
                 </div>
               ) : loading ? (
-                <div className="skeleton" style={{ width: 80, height: 28, opacity: 0.3 }} />
+                <div className="skeleton" style={{ width: 80, height: 24, opacity: 0.3 }} />
               ) : (
-                <span style={{ fontSize: 22, fontWeight: 600, opacity: 0.4 }}>--</span>
+                <span style={{ fontSize: 20, fontWeight: 600, opacity: 0.4 }}>--</span>
               )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* ===== Content Area ===== */}
+      {/* ===== Account Cards ===== */}
+      <div style={{ padding: "14px 14px 100px" }}>
+        {displayAccounts.length > 0 ? (
+          <>
+            {displayAccounts.map((acc, i) => (
+              <AccountCard
+                key={acc.id}
+                account={acc}
+                estimates={estimates}
+                showFunds={showFunds}
+                onClick={() => setTab(acc.id)}
+                onFundClick={handleFundClick}
+                iconGradient={ICON_GRADIENTS[accounts.indexOf(acc) % ICON_GRADIENTS.length]}
+              />
+            ))}
 
-      {/* 账户汇总 */}
-      {activeTab === 'summary' && (
-        <div style={{ padding: '16px 16px 32px' }}>
-          {accounts.length > 0 ? (
-            <>
-              <div style={{ fontSize: 15, fontWeight: 600, color: '#333', marginBottom: 12, paddingLeft: 4 }}>
-                账户明细
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {accounts.map((acc, i) => (
-                  <AccountCard
-                    key={acc.id}
-                    account={acc}
-                    estimates={estimates}
-                    onClick={() => setTab(acc.id)}
-                    iconGradient={ICON_GRADIENTS[i % ICON_GRADIENTS.length]}
-                  />
-                ))}
-              </div>
-              <button onClick={() => navigate('/add-account')} className="dashed-add-btn">
-                <span style={{ fontSize: 18 }}>+</span>
-                新增账户
-              </button>
-            </>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 60, padding: '0 32px' }}>
-              <svg style={{ width: 72, height: 72, marginBottom: 16, color: '#ddd' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1}
-                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-              </svg>
-              <p style={{ fontSize: 15, color: '#999', marginBottom: 6 }}>还没有添加账户</p>
-              <p style={{ fontSize: 12, color: '#ccc', marginBottom: 24 }}>先创建一个账户，比如「支付宝」</p>
+            {/* Bottom actions */}
+            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4, padding: "0 4px" }}>
               <button
-                onClick={() => navigate('/add-account')}
-                className="gradient-btn"
-                style={{ padding: '12px 32px', fontSize: 15 }}
-              >
-                + 新建账户
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* 全部（跨账户聚合） */}
-      {activeTab === 'all' && (
-        <div style={{ padding: '16px 16px 32px' }}>
-          {aggregatedFunds.length > 0 ? (
-            <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px rgba(0,0,0,0.04)', overflow: 'hidden' }}>
-              <FundListSection funds={aggregatedFunds} accountId={null} />
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 60 }}>
-              <p style={{ fontSize: 15, color: '#999' }}>还没有添加基金</p>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* 单个账户 */}
-      {currentAccount && (
-        <div style={{ padding: '16px 16px 32px' }}>
-          {currentAccount.funds.length > 0 ? (
-            <>
-              <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px rgba(0,0,0,0.04)', overflow: 'hidden' }}>
-                <FundListSection funds={currentAccount.funds} accountId={currentAccount.id} />
-              </div>
-              <button onClick={() => navigate(`/add/${currentAccount.id}`)} className="dashed-add-btn">
-                <span style={{ fontSize: 18 }}>+</span>
-                新增持有
-              </button>
-            </>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 60 }}>
-              <p style={{ fontSize: 15, color: '#999', marginBottom: 20 }}>该账户还没有添加基金</p>
-              <button
-                onClick={() => navigate(`/add/${currentAccount.id}`)}
-                className="gradient-btn"
-                style={{ padding: '10px 24px', fontSize: 14 }}
+                onClick={() => {
+                  const targetId = currentAccount ? currentAccount.id : (accounts[0]?.id);
+                  if (targetId) navigate(`/add/${targetId}`);
+                }}
+                style={{
+                  padding: "12px 0", flex: 1, marginRight: 8,
+                  borderRadius: 12, border: "1.5px dashed #d0d5dd",
+                  background: "transparent", color: "#999", fontSize: 13, cursor: "pointer",
+                }}
               >
                 + 新增持有
               </button>
+              <button
+                onClick={() => navigate('/add-account')}
+                style={{
+                  padding: "12px 0", flex: 1, marginLeft: 8,
+                  borderRadius: 12, border: "1px solid #e0e0e0",
+                  background: "#fff", color: "#666", fontSize: 13, cursor: "pointer",
+                }}
+              >
+                + 新增账户
+              </button>
             </div>
-          )}
-        </div>
-      )}
+          </>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: 60, padding: "0 32px" }}>
+            <svg style={{ width: 72, height: 72, marginBottom: 16, color: "#ddd" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1}
+                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+            <p style={{ fontSize: 15, color: "#999", marginBottom: 6 }}>还没有添加账户</p>
+            <p style={{ fontSize: 12, color: "#ccc", marginBottom: 24 }}>先创建一个账户，比如「支付宝」</p>
+            <button
+              onClick={() => navigate('/add-account')}
+              style={{
+                padding: "12px 32px", fontSize: 15, fontWeight: 500,
+                background: "linear-gradient(135deg, #667eea, #764ba2)",
+                color: "#fff", border: "none", borderRadius: 12, cursor: "pointer",
+              }}
+            >
+              + 新建账户
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* ===== Bottom Nav ===== */}
+      <div
+        style={{
+          position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)",
+          width: "100%", maxWidth: 430,
+          background: "rgba(255,255,255,0.97)", backdropFilter: "blur(12px)",
+          borderTop: "1px solid rgba(0,0,0,0.06)",
+          display: "flex", justifyContent: "space-around",
+          padding: "8px 0 22px",
+        }}
+      >
+        {[
+          { icon: "📊", label: "持有", active: true },
+          { icon: "⭐", label: "自选" },
+          { icon: "📈", label: "行情" },
+          { icon: "📰", label: "资讯" },
+          { icon: "💎", label: "会员" },
+          { icon: "👤", label: "我的" },
+        ].map((item) => (
+          <div
+            key={item.label}
+            style={{
+              display: "flex", flexDirection: "column", alignItems: "center",
+              gap: 2, cursor: "pointer",
+            }}
+          >
+            <span style={{ fontSize: 18 }}>{item.icon}</span>
+            <span
+              style={{
+                fontSize: 10,
+                color: item.active ? "#764ba2" : "#999",
+                fontWeight: item.active ? 600 : 400,
+              }}
+            >
+              {item.label}
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

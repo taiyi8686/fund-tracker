@@ -1,41 +1,39 @@
 import { useNavigate } from 'react-router-dom';
 
-export default function Header({ title, showBack = false, leftContent, rightAction }) {
+export default function Header({ title, subtitle, showBack = false, rightAction, gradient = "purple" }) {
   const navigate = useNavigate();
+  const bg = gradient === "blue"
+    ? "linear-gradient(135deg, #1a5ce0 0%, #2d7ff9 100%)"
+    : "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
 
   return (
-    <header
+    <div
       style={{
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        padding: '0 16px',
-        height: 48,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        color: '#fff',
-        position: 'sticky',
-        top: 0,
-        zIndex: 10,
+        background: bg,
+        padding: "16px 16px 20px",
+        color: "#fff",
       }}
     >
-      <div style={{ minWidth: 48 }}>
-        {showBack ? (
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        {showBack && (
           <button
             onClick={() => navigate(-1)}
             style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              width: 44, height: 44, marginLeft: -8,
-              background: 'none', border: 'none', cursor: 'pointer', color: '#fff',
+              background: "none", border: "none", color: "#fff",
+              fontSize: 22, cursor: "pointer", padding: 0, lineHeight: 1,
             }}
           >
-            <svg style={{ width: 20, height: 20 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
+            ←
           </button>
-        ) : leftContent || null}
+        )}
+        <div style={{ flex: 1, textAlign: "center" }}>
+          <div style={{ fontSize: 15, fontWeight: 600 }}>{title}</div>
+          {subtitle && <div style={{ fontSize: 11, opacity: 0.7 }}>{subtitle}</div>}
+        </div>
+        <div style={{ minWidth: 22, display: "flex", justifyContent: "flex-end" }}>
+          {rightAction || <div style={{ width: 22 }} />}
+        </div>
       </div>
-      <span style={{ fontSize: 16, fontWeight: 600 }}>{title}</span>
-      <div style={{ minWidth: 48, display: 'flex', justifyContent: 'flex-end' }}>{rightAction}</div>
-    </header>
+    </div>
   );
 }

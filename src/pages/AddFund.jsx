@@ -71,22 +71,28 @@ export default function AddFund() {
   if (!account) return null;
 
   return (
-    <div className="app-shell" style={{ background: '#f5f6fa' }}>
+    <div
+      style={{
+        maxWidth: 430, margin: "0 auto", minHeight: "100vh",
+        background: "#f5f6fa",
+        fontFamily: '-apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif',
+      }}
+    >
       <Header title={`${editCode ? '编辑' : '新增'}持有 · ${account.name}`} showBack />
 
-      <div style={{ padding: 16 }}>
-        <div style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
+      <div style={{ padding: 14 }}>
+        <div style={{ background: "#fff", borderRadius: 16, overflow: "hidden", boxShadow: "0 1px 8px rgba(0,0,0,0.04)" }}>
           {/* Fund Code */}
-          <div style={{ padding: '16px 20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ padding: "14px 18px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <span style={{
-                fontSize: 12, fontWeight: 500, padding: '4px 10px', borderRadius: 6,
-                color: '#764ba2', background: 'rgba(118,75,162,0.08)', flexShrink: 0,
+                fontSize: 12, fontWeight: 500, padding: "4px 10px", borderRadius: 6,
+                color: "#764ba2", background: "rgba(118,75,162,0.08)", flexShrink: 0,
               }}>
                 基金名称
               </span>
               {confirmed && fundName ? (
-                <span style={{ fontSize: 14, color: '#1a1a2e' }}>{fundName}</span>
+                <span style={{ fontSize: 14, color: "#1a1a2e" }}>{fundName}</span>
               ) : (
                 <input
                   type="text" inputMode="numeric" value={code}
@@ -94,8 +100,8 @@ export default function AddFund() {
                   placeholder="请输入基金代码，如 002207"
                   disabled={!!editCode}
                   style={{
-                    flex: 1, fontSize: 14, outline: 'none', border: 'none',
-                    background: 'transparent', color: '#1a1a2e',
+                    flex: 1, fontSize: 14, outline: "none", border: "none",
+                    background: "transparent", color: "#1a1a2e",
                     opacity: editCode ? 0.6 : 1,
                   }}
                 />
@@ -105,17 +111,22 @@ export default function AddFund() {
               <button
                 onClick={searchFund}
                 disabled={searching || code.length !== 6}
-                className="gradient-btn"
-                style={{ width: '100%', marginTop: 12, padding: '10px 0', fontSize: 14 }}
+                style={{
+                  width: "100%", marginTop: 12, padding: "10px 0", fontSize: 14,
+                  fontWeight: 500, border: "none", borderRadius: 10, cursor: "pointer",
+                  background: "linear-gradient(135deg, #667eea, #764ba2)",
+                  color: "#fff",
+                  opacity: (searching || code.length !== 6) ? 0.4 : 1,
+                }}
               >
                 {searching ? '查询中...' : '查询基金'}
               </button>
             )}
-            {searchError && <p style={{ fontSize: 12, marginTop: 8, color: '#e94560' }}>{searchError}</p>}
+            {searchError && <p style={{ fontSize: 12, marginTop: 8, color: "#e94560" }}>{searchError}</p>}
             {confirmed && !editCode && (
               <button
                 onClick={() => { setConfirmed(false); setFundName(''); setCode(''); }}
-                style={{ fontSize: 12, marginTop: 6, color: '#764ba2', background: 'none', border: 'none', cursor: 'pointer' }}
+                style={{ fontSize: 12, marginTop: 6, color: "#764ba2", background: "none", border: "none", cursor: "pointer" }}
               >
                 重新选择基金
               </button>
@@ -124,11 +135,11 @@ export default function AddFund() {
 
           {confirmed && (
             <>
-              <div style={{ borderTop: '1px solid rgba(0,0,0,0.06)' }} />
-              <div style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ borderTop: "1px solid #f3f3f3" }} />
+              <div style={{ padding: "14px 18px", display: "flex", alignItems: "center", gap: 10 }}>
                 <span style={{
-                  fontSize: 12, fontWeight: 500, padding: '4px 10px', borderRadius: 6,
-                  color: '#764ba2', background: 'rgba(118,75,162,0.08)', flexShrink: 0,
+                  fontSize: 12, fontWeight: 500, padding: "4px 10px", borderRadius: 6,
+                  color: "#764ba2", background: "rgba(118,75,162,0.08)", flexShrink: 0,
                 }}>
                   持有金额
                 </span>
@@ -136,14 +147,14 @@ export default function AddFund() {
                   type="text" inputMode="decimal" value={amount}
                   onChange={(e) => setAmount(e.target.value.replace(/[^\d.]/g, ''))}
                   placeholder="输入该基金的持有金额"
-                  style={{ flex: 1, fontSize: 14, outline: 'none', border: 'none', background: 'transparent', color: '#1a1a2e' }}
+                  style={{ flex: 1, fontSize: 14, outline: "none", border: "none", background: "transparent", color: "#1a1a2e" }}
                 />
               </div>
-              <div style={{ borderTop: '1px solid rgba(0,0,0,0.06)' }} />
-              <div style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ borderTop: "1px solid #f3f3f3" }} />
+              <div style={{ padding: "14px 18px", display: "flex", alignItems: "center", gap: 10 }}>
                 <span style={{
-                  fontSize: 12, fontWeight: 500, padding: '4px 10px', borderRadius: 6,
-                  color: '#764ba2', background: 'rgba(118,75,162,0.08)', flexShrink: 0,
+                  fontSize: 12, fontWeight: 500, padding: "4px 10px", borderRadius: 6,
+                  color: "#764ba2", background: "rgba(118,75,162,0.08)", flexShrink: 0,
                 }}>
                   持有收益
                 </span>
@@ -151,7 +162,7 @@ export default function AddFund() {
                   type="text" inputMode="decimal" value={profit}
                   onChange={(e) => setProfit(e.target.value.replace(/[^\d.\-]/g, ''))}
                   placeholder="亏损填负数，如 -457"
-                  style={{ flex: 1, fontSize: 14, outline: 'none', border: 'none', background: 'transparent', color: '#1a1a2e' }}
+                  style={{ flex: 1, fontSize: 14, outline: "none", border: "none", background: "transparent", color: "#1a1a2e" }}
                 />
               </div>
             </>
@@ -162,8 +173,13 @@ export default function AddFund() {
           <button
             onClick={handleSubmit}
             disabled={!confirmed || !amount || !(parseFloat(amount) > 0)}
-            className="gradient-btn"
-            style={{ width: '100%', marginTop: 16, padding: '12px 0', fontSize: 15 }}
+            style={{
+              width: "100%", marginTop: 14, padding: "12px 0", fontSize: 15,
+              fontWeight: 500, border: "none", borderRadius: 12, cursor: "pointer",
+              background: "linear-gradient(135deg, #667eea, #764ba2)",
+              color: "#fff",
+              opacity: (!confirmed || !amount || !(parseFloat(amount) > 0)) ? 0.4 : 1,
+            }}
           >
             完成
           </button>
