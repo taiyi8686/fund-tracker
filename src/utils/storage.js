@@ -81,3 +81,26 @@ export function getAllFundCodes() {
   getAccounts().forEach(a => a.funds.forEach(f => codes.add(f.code)));
   return [...codes];
 }
+
+// 全部页面：跨账户聚合相同基金
+export function getAllFundsAggregated() {
+  const accounts = getAccounts();
+  const fundMap = {};
+  accounts.forEach(account => {
+    account.funds.forEach(fund => {
+      if (fundMap[fund.code]) {
+        fundMap[fund.code].amount += fund.amount;
+        fundMap[fund.code].profit += fund.profit;
+      } else {
+        fundMap[fund.code] = {
+          code: fund.code,
+          name: fund.name,
+          amount: fund.amount,
+          profit: fund.profit,
+          addedAt: fund.addedAt,
+        };
+      }
+    });
+  });
+  return Object.values(fundMap);
+}

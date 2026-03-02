@@ -40,22 +40,15 @@ export default function FundDetail() {
     navigate(`/?tab=${accountId}`, { replace: true });
   };
 
-  const InfoRow = ({ label, value }) => (
-    <div className="flex justify-between items-center py-3.5 border-b border-gray-50 last:border-0">
-      <span className="text-[14px] text-gray-500">{label}</span>
-      <span className="text-[14px] font-medium text-gray-800">{value}</span>
-    </div>
-  );
-
   return (
-    <div className="min-h-screen bg-[#F5F6FA] safe-bottom">
+    <div className="min-h-screen bg-[#F5F6F8] safe-bottom">
       <Header
         title="基金详情"
         showBack
         rightAction={
           <button
             onClick={() => navigate(`/add/${accountId}?edit=${code}`)}
-            className="text-blue-500 text-[15px]"
+            className="text-blue-500 text-[14px]"
           >
             编辑
           </button>
@@ -63,16 +56,16 @@ export default function FundDetail() {
       />
 
       {/* 基金名称 + 实时估值 */}
-      <div className="bg-white mx-4 mt-3 rounded-xl px-5 py-4">
-        <div className="text-[17px] font-semibold text-gray-800">
+      <div className="bg-white px-4 pt-4 pb-3">
+        <div className="text-[17px] font-bold text-gray-900">
           {estimate?.name || fund.name || '加载中...'}
         </div>
         <div className="text-[13px] text-gray-400 mt-0.5">{fund.code}</div>
 
         {hasEstimate && (
-          <div className="mt-4 flex items-end gap-4">
+          <div className="mt-4 flex items-end gap-3">
             <div>
-              <div className="text-[12px] text-gray-400 mb-1">实时估值</div>
+              <div className="text-[12px] text-gray-400 mb-0.5">实时估值</div>
               <div className="text-[28px] font-bold text-gray-900 leading-tight">
                 {estimate.estimateValue.toFixed(4)}
               </div>
@@ -83,26 +76,26 @@ export default function FundDetail() {
           </div>
         )}
         {hasEstimate && (
-          <div className="text-[11px] text-gray-300 mt-2.5">
+          <div className="text-[11px] text-gray-300 mt-2">
             估算时间：{estimate.estimateTime} | 净值日期：{estimate.valueDate}
           </div>
         )}
         {loading && <div className="skeleton w-40 h-10 mt-4" />}
       </div>
 
-      {/* 当日估算收益 + 持有收益 并排 */}
-      <div className="flex gap-2.5 mx-4 mt-2.5">
+      {/* 当日估算收益 + 持有收益 */}
+      <div className="flex gap-2 mx-3 mt-2">
         {dailyProfit !== null && (
-          <div className={`flex-1 rounded-xl px-4 py-3.5 ${dailyGrowth >= 0 ? 'bg-profit-light' : 'bg-loss-light'}`}>
-            <div className="text-[12px] text-gray-500 mb-1.5">当日估算收益</div>
-            <div className={`text-[22px] font-bold ${dailyGrowth >= 0 ? 'text-profit' : 'text-loss'}`}>
+          <div className={`flex-1 rounded-lg px-3.5 py-3 ${dailyGrowth >= 0 ? 'bg-red-50' : 'bg-green-50'}`}>
+            <div className="text-[12px] text-gray-500 mb-1">当日估算收益</div>
+            <div className={`text-[20px] font-bold ${dailyGrowth >= 0 ? 'text-profit' : 'text-loss'}`}>
               {dailyProfit >= 0 ? '+' : ''}¥{dailyProfit.toFixed(2)}
             </div>
           </div>
         )}
-        <div className={`flex-1 rounded-xl px-4 py-3.5 ${totalProfit >= 0 ? 'bg-profit-light' : 'bg-loss-light'}`}>
-          <div className="text-[12px] text-gray-500 mb-1.5">持有收益</div>
-          <div className={`text-[22px] font-bold ${totalProfit >= 0 ? 'text-profit' : 'text-loss'}`}>
+        <div className={`flex-1 rounded-lg px-3.5 py-3 ${totalProfit >= 0 ? 'bg-red-50' : 'bg-green-50'}`}>
+          <div className="text-[12px] text-gray-500 mb-1">持有收益</div>
+          <div className={`text-[20px] font-bold ${totalProfit >= 0 ? 'text-profit' : 'text-loss'}`}>
             {totalProfit >= 0 ? '+' : ''}¥{totalProfit.toFixed(2)}
           </div>
           <div className={`text-[12px] mt-0.5 ${totalProfitRate >= 0 ? 'text-profit' : 'text-loss'}`}>
@@ -112,37 +105,46 @@ export default function FundDetail() {
       </div>
 
       {/* 明细信息 */}
-      <div className="bg-white mx-4 mt-2.5 rounded-xl px-5 py-1">
-        <InfoRow label="持有金额" value={`¥${fund.amount.toFixed(2)}`} />
-        <InfoRow label="买入成本" value={`¥${cost.toFixed(2)}`} />
+      <div className="bg-white mx-3 mt-2 rounded-lg">
+        <DetailRow label="持有金额" value={`¥${fund.amount.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} />
+        <DetailRow label="买入成本" value={`¥${cost.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} />
         {hasEstimate && (
-          <InfoRow label="上个交易日净值" value={estimate.netValue.toFixed(4)} />
+          <DetailRow label="上个交易日净值" value={estimate.netValue.toFixed(4)} />
         )}
-        <InfoRow label="添加日期" value={fund.addedAt} />
+        <DetailRow label="添加日期" value={fund.addedAt} last />
       </div>
 
       {/* 删除 */}
-      <div className="px-4 mt-8 pb-8">
+      <div className="px-3 mt-8 pb-8">
         {!showConfirm ? (
           <button
             onClick={() => setShowConfirm(true)}
-            className="w-full py-3 text-red-500 bg-white rounded-xl border border-red-200 text-[15px] active:bg-red-50 transition-colors"
+            className="w-full py-3 text-red-500 bg-white rounded-lg border border-red-200 text-[14px] active:bg-red-50"
           >
             删除该基金
           </button>
         ) : (
-          <div className="flex gap-3">
+          <div className="flex gap-2.5">
             <button onClick={() => setShowConfirm(false)}
-              className="flex-1 py-3 bg-gray-100 rounded-xl text-gray-600 text-[15px]">
+              className="flex-1 py-3 bg-gray-100 rounded-lg text-gray-600 text-[14px]">
               取消
             </button>
             <button onClick={handleDelete}
-              className="flex-1 py-3 bg-red-500 text-white rounded-xl text-[15px] active:bg-red-600">
+              className="flex-1 py-3 bg-red-500 text-white rounded-lg text-[14px] active:bg-red-600">
               确认删除
             </button>
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+function DetailRow({ label, value, last }) {
+  return (
+    <div className={`flex justify-between items-center px-4 py-3 ${last ? '' : 'border-b border-gray-50'}`}>
+      <span className="text-[14px] text-gray-500">{label}</span>
+      <span className="text-[14px] font-medium text-gray-800">{value}</span>
     </div>
   );
 }
