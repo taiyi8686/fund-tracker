@@ -62,7 +62,7 @@ export default function Dashboard() {
     return (
       <button
         onClick={() => setTab(id)}
-        className="relative px-4 py-2.5 whitespace-nowrap cursor-pointer transition-colors duration-150"
+        className="relative px-5 py-3 whitespace-nowrap cursor-pointer transition-colors duration-150"
         style={{
           fontSize: '15px',
           fontWeight: isActive ? 700 : 400,
@@ -85,7 +85,7 @@ export default function Dashboard() {
     <>
       {/* 列头 */}
       <div
-        className="fund-grid px-4 py-2"
+        className="fund-grid px-5 py-2"
         style={{ backgroundColor: 'var(--color-bg)', borderBottom: '1px solid var(--color-border)' }}
       >
         <div />
@@ -110,7 +110,7 @@ export default function Dashboard() {
               clickable={!!accountId}
             />
             {i < funds.length - 1 && (
-              <div className="mx-4" style={{ borderBottom: '1px solid var(--color-border)' }} />
+              <div className="mx-5" style={{ borderBottom: '1px solid var(--color-border)' }} />
             )}
           </div>
         ))}
@@ -140,7 +140,7 @@ export default function Dashboard() {
 
       {/* ===== 标签栏 ===== */}
       <div
-        className="flex items-center bg-white overflow-x-auto no-scrollbar"
+        className="flex items-center bg-white overflow-x-auto no-scrollbar pl-2"
         style={{ borderBottom: '1px solid var(--color-border)' }}
       >
         <TabItem id="summary" label="账户汇总" />
@@ -150,7 +150,7 @@ export default function Dashboard() {
         ))}
         <button
           onClick={() => navigate('/add-account')}
-          className="px-4 py-2.5 text-lg leading-none whitespace-nowrap cursor-pointer"
+          className="px-5 py-3 text-lg leading-none whitespace-nowrap cursor-pointer"
           style={{ color: 'var(--color-text-tertiary)' }}
         >
           +
@@ -172,7 +172,7 @@ export default function Dashboard() {
               ))}
 
               <div className="h-2" style={{ backgroundColor: 'var(--color-bg)' }} />
-              <div className="bg-white px-4 py-3">
+              <div className="bg-white px-5 py-3">
                 <button
                   onClick={() => navigate('/add-account')}
                   className="text-sm cursor-pointer"
@@ -226,7 +226,7 @@ export default function Dashboard() {
               <FundListSection funds={currentAccount.funds} accountId={currentAccount.id} />
 
               <div className="h-2" style={{ backgroundColor: 'var(--color-bg)' }} />
-              <div className="bg-white px-4 py-3 flex justify-between">
+              <div className="bg-white px-5 py-3 flex justify-between">
                 <button
                   onClick={() => navigate(`/add/${currentAccount.id}`)}
                   className="text-sm cursor-pointer"

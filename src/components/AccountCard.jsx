@@ -30,7 +30,7 @@ export default function AccountCard({ account, estimates, onClick }) {
       className="bg-white cursor-pointer transition-colors duration-200 active:bg-gray-50"
     >
       {/* 账户名 + 涨跌箭头 */}
-      <div className="flex justify-between items-center px-4 pt-4 pb-2">
+      <div className="flex justify-between items-center px-5 pt-4 pb-2">
         <span className="text-base font-bold" style={{ color: 'var(--color-text-primary)' }}>
           {account.name}
         </span>
@@ -41,7 +41,7 @@ export default function AccountCard({ account, estimates, onClick }) {
       </div>
 
       {/* 账户资产 + 迷你曲线 */}
-      <div className="flex items-end justify-between px-4 pb-1">
+      <div className="flex items-end justify-between px-5 pb-1">
         <div>
           <div className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>账户资产</div>
           <div className="text-xl font-bold leading-tight" style={{ color: 'var(--color-text-primary)' }}>
@@ -52,7 +52,7 @@ export default function AccountCard({ account, estimates, onClick }) {
       </div>
 
       {/* 持有收益 + 当日收益 */}
-      <div className="flex px-4 pt-2 pb-4">
+      <div className="flex px-5 pt-2 pb-4">
         <div className="flex-1">
           <div className="text-xs mb-0.5" style={{ color: 'var(--color-text-tertiary)' }}>持有收益</div>
           <div className="flex items-baseline gap-1.5 flex-wrap">

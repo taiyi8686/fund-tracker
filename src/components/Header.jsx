@@ -5,7 +5,7 @@ export default function Header({ title, showBack = false, leftContent, rightActi
 
   return (
     <header className="sticky top-0 z-10 bg-white border-b" style={{ borderColor: 'var(--color-border)' }}>
-      <div className="flex items-center justify-between h-11 px-4">
+      <div className="flex items-center justify-between h-11 px-5">
         <div className="min-w-12">
           {showBack ? (
             <button

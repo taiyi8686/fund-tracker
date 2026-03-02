@@ -56,7 +56,7 @@ export default function FundDetail() {
       />
 
       {/* 基金名称 + 实时估值 */}
-      <div className="bg-white px-4 pt-4 pb-3">
+      <div className="bg-white px-5 pt-4 pb-3">
         <div className="text-base font-bold" style={{ color: 'var(--color-text-primary)' }}>
           {estimate?.name || fund.name || '加载中...'}
         </div>
@@ -84,7 +84,7 @@ export default function FundDetail() {
       </div>
 
       {/* 当日估算收益 + 持有收益 */}
-      <div className="flex gap-2 mx-3 mt-2">
+      <div className="flex gap-2 mx-4 mt-2">
         {dailyProfit !== null && (
           <div
             className="flex-1 rounded-lg px-3.5 py-3"
@@ -111,7 +111,7 @@ export default function FundDetail() {
       </div>
 
       {/* 明细信息 */}
-      <div className="bg-white mx-3 mt-2 rounded-lg overflow-hidden">
+      <div className="bg-white mx-4 mt-2 rounded-lg overflow-hidden">
         <InfoRow label="持有金额" value={`¥${fund.amount.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}`} />
         <InfoRow label="买入成本" value={`¥${cost.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}`} />
         {hasEstimate && <InfoRow label="上个交易日净值" value={estimate.netValue.toFixed(4)} />}
@@ -119,7 +119,7 @@ export default function FundDetail() {
       </div>
 
       {/* 删除 */}
-      <div className="px-3 mt-8 pb-8">
+      <div className="px-4 mt-8 pb-8">
         {!showConfirm ? (
           <button
             onClick={() => setShowConfirm(true)}
@@ -154,7 +154,7 @@ export default function FundDetail() {
 function InfoRow({ label, value, last }) {
   return (
     <div
-      className="flex justify-between items-center px-4 py-3"
+      className="flex justify-between items-center px-5 py-3"
       style={last ? {} : { borderBottom: '1px solid var(--color-border)' }}
     >
       <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{label}</span>

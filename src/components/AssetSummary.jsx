@@ -15,7 +15,7 @@ export default function AssetSummary({ funds, estimates, loading }) {
   const isDailyUp = totalDailyProfit >= 0;
 
   return (
-    <div className="bg-white px-4 pt-4 pb-3" style={{ borderBottom: '1px solid var(--color-border)' }}>
+    <div className="bg-white px-5 pt-4 pb-3" style={{ borderBottom: '1px solid var(--color-border)' }}>
       <div className="flex justify-between items-start">
         {/* 左侧：账户资产 */}
         <div className="flex-1">

@@ -19,7 +19,7 @@ export default function FundCard({ fund, estimate, accountId, clickable = true }
   return (
     <div
       onClick={handleClick}
-      className={`fund-grid px-4 py-3.5 min-h-[56px] transition-colors duration-150 ${
+      className={`fund-grid px-5 py-3.5 min-h-[56px] transition-colors duration-150 ${
         clickable ? 'cursor-pointer active:bg-gray-50' : ''
       }`}
     >
