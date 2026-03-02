@@ -16,7 +16,7 @@ function ProtectedRoute({ children }) {
 export default function App() {
   return (
     <HashRouter>
-      <div className="max-w-lg mx-auto min-h-screen">
+      <div className="min-h-screen">
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />

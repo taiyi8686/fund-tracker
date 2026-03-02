@@ -40,10 +40,10 @@ export default function FundDetail() {
     navigate(`/?tab=${accountId}`, { replace: true });
   };
 
-  const InfoRow = ({ label, value, valueClass = '' }) => (
-    <div className="flex justify-between items-center py-3 border-b border-gray-50 last:border-0">
-      <span className="text-sm text-gray-500">{label}</span>
-      <span className={`text-sm font-medium ${valueClass}`}>{value}</span>
+  const InfoRow = ({ label, value }) => (
+    <div className="flex justify-between items-center py-3.5 border-b border-gray-50 last:border-0">
+      <span className="text-base text-gray-500">{label}</span>
+      <span className="text-base font-medium text-gray-800">{value}</span>
     </div>
   );
 
@@ -55,60 +55,64 @@ export default function FundDetail() {
         rightAction={
           <button
             onClick={() => navigate(`/add/${accountId}?edit=${code}`)}
-            className="text-blue-500 text-sm"
+            className="text-blue-500 text-base"
           >
             编辑
           </button>
         }
       />
 
-      <div className="bg-white mx-4 mt-4 rounded-xl p-5 shadow-sm">
-        <div className="text-base font-semibold text-gray-800">
+      {/* 基金名称 + 实时估值 */}
+      <div className="bg-white mx-4 mt-4 rounded-2xl p-5 shadow-sm">
+        <div className="text-lg font-semibold text-gray-800">
           {estimate?.name || fund.name || '加载中...'}
         </div>
-        <div className="text-xs text-gray-400 mt-1">{fund.code}</div>
+        <div className="text-sm text-gray-400 mt-1">{fund.code}</div>
 
         {hasEstimate && (
-          <div className="mt-4 flex items-end gap-4">
+          <div className="mt-5 flex items-end gap-4">
             <div>
-              <div className="text-xs text-gray-400">实时估值</div>
-              <div className="text-2xl font-bold text-gray-800">
+              <div className="text-sm text-gray-400 mb-1">实时估值</div>
+              <div className="text-3xl font-bold text-gray-800">
                 {estimate.estimateValue.toFixed(4)}
               </div>
             </div>
-            <div className={`text-lg font-bold ${dailyGrowth >= 0 ? 'text-profit' : 'text-loss'}`}>
+            <div className={`text-xl font-bold mb-1 ${dailyGrowth >= 0 ? 'text-profit' : 'text-loss'}`}>
               {dailyGrowth >= 0 ? '+' : ''}{dailyGrowth.toFixed(2)}%
             </div>
           </div>
         )}
         {hasEstimate && (
-          <div className="text-xs text-gray-300 mt-2">
+          <div className="text-sm text-gray-300 mt-3">
             估算时间：{estimate.estimateTime} | 净值日期：{estimate.valueDate}
           </div>
         )}
-        {loading && <div className="skeleton w-32 h-8 mt-4" />}
+        {loading && <div className="skeleton w-40 h-10 mt-4" />}
       </div>
 
-      {dailyProfit !== null && (
-        <div className={`mx-4 mt-3 rounded-xl p-4 shadow-sm ${dailyGrowth >= 0 ? 'bg-red-50' : 'bg-green-50'}`}>
-          <div className="text-xs text-gray-500 mb-1">当日估算收益</div>
-          <div className={`text-2xl font-bold ${dailyGrowth >= 0 ? 'text-profit' : 'text-loss'}`}>
-            {dailyProfit >= 0 ? '+' : ''}¥{dailyProfit.toFixed(2)}
+      {/* 当日估算收益 + 持有收益 并排 */}
+      <div className="flex gap-3 mx-4 mt-3">
+        {dailyProfit !== null && (
+          <div className={`flex-1 rounded-2xl p-4 shadow-sm ${dailyGrowth >= 0 ? 'bg-red-50' : 'bg-green-50'}`}>
+            <div className="text-sm text-gray-500 mb-2">当日估算收益</div>
+            <div className={`text-2xl font-bold ${dailyGrowth >= 0 ? 'text-profit' : 'text-loss'}`}>
+              {dailyProfit >= 0 ? '+' : ''}¥{dailyProfit.toFixed(2)}
+            </div>
+          </div>
+        )}
+        <div className={`flex-1 rounded-2xl p-4 shadow-sm ${totalProfit >= 0 ? 'bg-red-50' : 'bg-green-50'}`}>
+          <div className="text-sm text-gray-500 mb-2">持有收益</div>
+          <div className={`text-2xl font-bold ${totalProfit >= 0 ? 'text-profit' : 'text-loss'}`}>
+            {totalProfit >= 0 ? '+' : ''}¥{totalProfit.toFixed(2)}
+          </div>
+          <div className={`text-sm mt-1 ${totalProfitRate >= 0 ? 'text-profit' : 'text-loss'}`}>
+            {totalProfitRate >= 0 ? '+' : ''}{totalProfitRate.toFixed(2)}%
           </div>
         </div>
-      )}
-
-      <div className={`mx-4 mt-3 rounded-xl p-4 shadow-sm ${totalProfit >= 0 ? 'bg-red-50' : 'bg-green-50'}`}>
-        <div className="text-xs text-gray-500 mb-1">持有收益</div>
-        <div className={`text-2xl font-bold ${totalProfit >= 0 ? 'text-profit' : 'text-loss'}`}>
-          {totalProfit >= 0 ? '+' : ''}¥{totalProfit.toFixed(2)}
-          <span className="text-sm ml-2">
-            {totalProfitRate >= 0 ? '+' : ''}{totalProfitRate.toFixed(2)}%
-          </span>
-        </div>
       </div>
 
-      <div className="bg-white mx-4 mt-3 rounded-xl p-4 shadow-sm">
+      {/* 明细信息 */}
+      <div className="bg-white mx-4 mt-3 rounded-2xl px-5 py-2 shadow-sm">
         <InfoRow label="持有金额" value={`¥${fund.amount.toFixed(2)}`} />
         <InfoRow label="买入成本" value={`¥${cost.toFixed(2)}`} />
         {hasEstimate && (
@@ -117,22 +121,23 @@ export default function FundDetail() {
         <InfoRow label="添加日期" value={fund.addedAt} />
       </div>
 
-      <div className="px-4 mt-6 pb-8">
+      {/* 删除 */}
+      <div className="px-4 mt-8 pb-8">
         {!showConfirm ? (
           <button
             onClick={() => setShowConfirm(true)}
-            className="w-full py-3 text-red-500 bg-white rounded-xl border border-red-200 text-sm active:bg-red-50 transition-colors"
+            className="w-full py-3.5 text-red-500 bg-white rounded-2xl border border-red-200 text-base active:bg-red-50 transition-colors"
           >
             删除该基金
           </button>
         ) : (
           <div className="flex gap-3">
             <button onClick={() => setShowConfirm(false)}
-              className="flex-1 py-3 bg-gray-100 rounded-xl text-gray-600 text-sm">
+              className="flex-1 py-3.5 bg-gray-100 rounded-2xl text-gray-600 text-base">
               取消
             </button>
             <button onClick={handleDelete}
-              className="flex-1 py-3 bg-red-500 text-white rounded-xl text-sm active:bg-red-600">
+              className="flex-1 py-3.5 bg-red-500 text-white rounded-2xl text-base active:bg-red-600">
               确认删除
             </button>
           </div>
